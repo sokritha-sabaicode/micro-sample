@@ -6,3 +6,5 @@ import { UserSignUpSchema } from "../schema";
 const AuthRouter = express.Router();
 
 AuthRouter.post(SIGNUP_ROUTE, validateInput(UserSignUpSchema));
+
+export default AuthRouter;

@@ -10,7 +10,7 @@ const validateInput = (schema: ZodSchema) => {
       next();
     } catch (error: unknown) {
       if (error instanceof ZodError) {
-        next(new InvalidInputError(error));
+        return next(new InvalidInputError(error));
       }
       next(error);
     }

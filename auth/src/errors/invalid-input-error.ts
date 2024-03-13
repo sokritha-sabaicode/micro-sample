@@ -19,6 +19,6 @@ export default class InvalidInputError extends BaseCustomError {
   }
 
   serializeErrorOutput(): SerializedErrorOutput {
-    return { errors: this.errors?.errors };
+    return { errors: this.errors.errors };
   }
 }
