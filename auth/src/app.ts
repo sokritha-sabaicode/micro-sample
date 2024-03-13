@@ -7,9 +7,7 @@ const app = express();
 app.use(express.json());
 
 // Global API
-app.get("/", (req: Request, res: Response) => {
-  res.status(200).send({});
-});
+app.use("/auth", AuthRouter);
 
 app.use(errorHandler);
 
