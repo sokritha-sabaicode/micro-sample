@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import BaseCustomError from "../errors/base-custom-error";
-import { ZodError } from "zod";
 import { StatusCode } from "../utils/consts/status-code";
 
 const errorHandler = (
@@ -9,8 +8,10 @@ const errorHandler = (
   res: Response,
   _next: NextFunction
 ): Response => {
+  console.log(err instanceof BaseCustomError);
   // If the error is an instance of our own throw ERROR
   if (err instanceof BaseCustomError) {
+    console.log("Custom error handling");
     return res.status(err.getStatusCode()).json(err.serializeErrorOutput());
   }
 
