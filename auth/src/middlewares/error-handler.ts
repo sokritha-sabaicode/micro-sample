@@ -11,7 +11,6 @@ const errorHandler = (
   console.log(err instanceof BaseCustomError);
   // If the error is an instance of our own throw ERROR
   if (err instanceof BaseCustomError) {
-    console.log("Custom error handling");
     return res.status(err.getStatusCode()).json(err.serializeErrorOutput());
   }
 

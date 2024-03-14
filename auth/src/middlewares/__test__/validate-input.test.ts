@@ -33,9 +33,7 @@ describe("validateInput middleware", () => {
 
   test("should call next() with an InvalidInputError for invalid input", async () => {
     res = {};
-
     next = jest.fn();
-
     const req = {
       body: {
         fullname: "so",
