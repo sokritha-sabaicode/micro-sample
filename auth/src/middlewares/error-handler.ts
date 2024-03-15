@@ -8,7 +8,6 @@ const errorHandler = (
   res: Response,
   _next: NextFunction
 ): Response => {
-  console.log(err instanceof BaseCustomError);
   // If the error is an instance of our own throw ERROR
   if (err instanceof BaseCustomError) {
     return res.status(err.getStatusCode()).json(err.serializeErrorOutput());

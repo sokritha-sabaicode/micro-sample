@@ -1,7 +1,15 @@
 import bcrypt from "bcrypt";
-import UserModel, { IUser } from "../models/user.model";
+import UserModel, { IUser } from "../database/models/user.model";
+import UserRepository from "../database/repository/user-repository";
+import { generatePassword } from "../utils/jwt";
 
 class UserService {
+  repository: UserRepository;
+
+  constructor() {
+    this.repository = new UserRepository();
+  }
+
   /**
    * Create a new user with the provided details.
    * Passwords are hashed before storage for security.
@@ -12,13 +20,9 @@ class UserService {
 
   static async createUser(userDetails: IUser): Promise<IUser> {
     try {
-      const hashedPassword = await bcrypt.hash(userDetails.password, 10);
-      const user = new UserModel({
-        ...userDetails,
-        password: hashedPassword,
-      });
-      await user.save();
-      return user;
+      const hashedPassword = await generatePassword(userDetails.password);
+  
+      
     } catch (error: unknown) {
       throw new Error("");
     }
