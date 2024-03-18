@@ -1,21 +1,30 @@
 import APIError from "../../errors/api-error";
+import DuplicateError from "../../errors/duplicate-error";
 import UserModel, { IUser } from "../models/user.model";
 import { UserCreateRepository } from "./@types/user-repository.type";
 
 class UserRepository {
-  async CreateUser({ username, email, password, phone }: UserCreateRepository) {
+  async CreateUser({ username, email, password }: UserCreateRepository) {
     try {
+      // Check for existing user with the same email
+      const existingUser = await this.FindUser({ email });
+      if (existingUser) {
+        throw new DuplicateError("Email already in use");
+      }
+
       const user: IUser = new UserModel({
         username,
         email,
         password,
-        phone,
       });
 
       const userResult = await user.save();
       return userResult;
     } catch (error) {
-      throw new APIError("Unable to Create User");
+      if (error instanceof DuplicateError) {
+        throw error;
+      }
+      throw new APIError("Unable to Create User in Database");
     }
   }
 
@@ -24,7 +33,7 @@ class UserRepository {
       const existingUser = await UserModel.findOne({ email: email });
       return existingUser;
     } catch (error) {
-      throw new APIError("Unable to Find User");
+      throw new APIError("Unable to Find User in Database");
     }
   }
 
@@ -32,9 +41,9 @@ class UserRepository {
     try {
       const existingUser = await UserModel.findById(id);
 
-      return existingUser
+      return existingUser;
     } catch (error) {
-        throw new APIError("Unable to Find User")
+      throw new APIError("Unable to Find User in Database");
     }
   }
 }

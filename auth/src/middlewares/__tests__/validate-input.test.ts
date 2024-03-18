@@ -15,7 +15,7 @@ describe("validateInput middleware", () => {
     next = jest.fn();
   });
 
-  test("should call next() with no arguments for valid input", async () => {
+  test("should pass validation and call next() for valid input", async () => {
     res = {};
     next = jest.fn();
 

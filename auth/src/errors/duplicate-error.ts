@@ -2,19 +2,11 @@ import { StatusCode } from "../utils/consts";
 import { SerializedErrorOutput } from "./@types/serialized-error-output";
 import BaseCustomError from "./base-custom-error";
 
-// USE CASE:
-// 1. Unexpected Server Error
-// 2. Fallback Error Handler
-// 3. Generic Server Error
+export default class DuplicateError extends BaseCustomError {
+  constructor(message: string) {
+    super(message, StatusCode.Conflict);
 
-export default class APIError extends BaseCustomError {
-  constructor(
-    message: string,
-    statusCode: number = StatusCode.InternalServerError
-  ) {
-    super(message, statusCode);
-
-    Object.setPrototypeOf(this, APIError.prototype);
+    Object.setPrototypeOf(this, DuplicateError.prototype);
   }
 
   getStatusCode(): number {

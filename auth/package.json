@@ -1,17 +1,20 @@
 {
   "name": "auth",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "license": "MIT",
   "description": "Authentication microservice for our micro sample app",
   "scripts": {
     "start:dev": "nodemon src/index.ts",
     "start": "",
-    "test": "jest"
+    "test": "jest --watchAll"
   },
   "jest": {
     "testEnvironment": "node",
-    "preset": "ts-jest"
+    "preset": "ts-jest",
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.test.ts"
+    ]
   },
   "author": "Sokritha Yen",
   "dependencies": {
@@ -43,6 +46,7 @@
     "@types/nodemailer": "^6.4.14",
     "@types/supertest": "^6.0.2",
     "jest": "^29.7.0",
+    "mongodb-memory-server": "^9.1.7",
     "nodemon": "^3.1.0",
     "supertest": "^6.3.4",
     "ts-jest": "^29.1.2",

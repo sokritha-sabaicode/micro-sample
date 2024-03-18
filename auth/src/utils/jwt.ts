@@ -17,10 +17,10 @@ export const validatePassword = async ({
   return (await generatePassword(enteredPassword)) === savedPassword;
 };
 
-export const generateSignature = async (payload: object) => {
+export const generateSignature = async (payload: object): Promise<string> => {
   try {
     return await jwt.sign(payload, "", { expiresIn: "30d" });
   } catch (error) {
-    return error;
+    return "Unable to generate signature from jwt";
   }
 };
