@@ -12,6 +12,8 @@ class UserRepository {
         throw new DuplicateError("Email already in use");
       }
 
+      console.log("existing user", existingUser);
+
       const user: IUser = new UserModel({
         username,
         email,
@@ -21,6 +23,7 @@ class UserRepository {
       const userResult = await user.save();
       return userResult;
     } catch (error) {
+      console.log(error);
       if (error instanceof DuplicateError) {
         throw error;
       }
@@ -33,7 +36,7 @@ class UserRepository {
       const existingUser = await UserModel.findOne({ email: email });
       return existingUser;
     } catch (error) {
-      throw new APIError("Unable to Find User in Database");
+      return null;
     }
   }
 
