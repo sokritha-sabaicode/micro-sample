@@ -1,10 +1,15 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import APIError from "../errors/api-error";
 
 const salt = 10;
 
 export const generatePassword = async (password: string) => {
-  return await bcrypt.hash(password, salt);
+  try {
+    return await bcrypt.hash(password, salt);
+  } catch (error) {
+    throw new APIError("Unable to generate password");
+  }
 };
 
 export const validatePassword = async ({

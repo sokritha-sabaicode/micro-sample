@@ -2,6 +2,8 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import UserService from "../user.service";
 import DuplicateError from "../../errors/duplicate-error";
+import APIError from "../../errors/api-error";
+import { UserSignUpSchemaType } from "../../schema/@types/user";
 
 let mongoServer: MongoMemoryServer;
 
@@ -50,6 +52,39 @@ describe("User Service integration test", () => {
       password: "test_user@1234",
     };
 
-    expect(await userService.SignUp(MOCK_USER)).rejects.toThrow(DuplicateError);
+    await expect(userService.SignUp(MOCK_USER)).rejects.toThrow(DuplicateError);
+  });
+
+  it("should throw API error if the username is not provided", async () => {
+    const INVALID_MOCK_USER = {
+      email: "test_user1@example.com",
+      password: "test_user@1234",
+    };
+
+    await expect(
+      userService.SignUp(INVALID_MOCK_USER as UserSignUpSchemaType)
+    ).rejects.toThrow(APIError);
+  });
+
+  it("should throw API error if the email is not provided", async () => {
+    const INVALID_MOCK_USER = {
+      username: "test_user",
+      password: "test_user@1234",
+    };
+
+    await expect(
+      userService.SignUp(INVALID_MOCK_USER as UserSignUpSchemaType)
+    ).rejects.toThrow(APIError);
+  });
+
+  it("should throw API error if the password is not provided", async () => {
+    const INVALID_MOCK_USER = {
+      username: "test_user",
+      email: "test_user1@example.com",
+    };
+
+    await expect(
+      userService.SignUp(INVALID_MOCK_USER as UserSignUpSchemaType)
+    ).rejects.toThrow(APIError);
   });
 });
