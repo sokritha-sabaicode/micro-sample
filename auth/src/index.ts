@@ -1,6 +1,14 @@
 import app from "./app";
+import createConfig from "./utils/config";
+import path from "path";
 
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log("Server is listening on port: ", PORT);
-});
+async function run() {
+  const configPath = path.join(__dirname, "../configs/.env");
+  const config = createConfig(configPath);
+
+  app.listen(config.port, () => {
+    console.log("Server is listening on port: ", config.port);
+  });
+}
+
+run();
