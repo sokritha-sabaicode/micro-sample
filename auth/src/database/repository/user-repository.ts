@@ -12,8 +12,6 @@ class UserRepository {
         throw new DuplicateError("Email already in use");
       }
 
-      console.log("existing user", existingUser);
-
       const user: IUser = new UserModel({
         username,
         email,
@@ -23,7 +21,6 @@ class UserRepository {
       const userResult = await user.save();
       return userResult;
     } catch (error) {
-      console.log(error);
       if (error instanceof DuplicateError) {
         throw error;
       }

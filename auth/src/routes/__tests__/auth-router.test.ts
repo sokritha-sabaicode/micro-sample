@@ -1,5 +1,20 @@
 import request from "supertest";
 import app from "../../app";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import mongoose from "mongoose";
+
+let mongoServer: MongoMemoryServer;
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  const mongoUri = mongoServer.getUri();
+  await mongoose.connect(mongoUri);
+});
+
+afterAll(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 describe("POST /signup", () => {
   it("should create a new user when provided with valid input", async () => {
@@ -18,5 +33,5 @@ describe("POST /signup", () => {
     expect(response.body.data.username).toBe(MOCK_USER.username);
     expect(response.body.data.email).toBe(MOCK_USER.email);
     expect(response.body.token).toBeDefined();
-  }, 100000);
+  }, 50000);
 });
