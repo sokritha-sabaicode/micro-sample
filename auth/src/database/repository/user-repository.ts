@@ -1,6 +1,6 @@
 import APIError from "../../errors/api-error";
 import DuplicateError from "../../errors/duplicate-error";
-import UserModel, { IUser } from "../models/user.model";
+import UserModel from "../models/user.model";
 import { UserCreateRepository } from "./@types/user-repository.type";
 
 class UserRepository {
@@ -12,7 +12,7 @@ class UserRepository {
         throw new DuplicateError("Email already in use");
       }
 
-      const user: IUser = new UserModel({
+      const user = new UserModel({
         username,
         email,
         password,

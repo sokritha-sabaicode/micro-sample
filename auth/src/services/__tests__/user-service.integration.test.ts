@@ -40,9 +40,6 @@ describe("User Service integration test", () => {
     expect(newUser.user).toBeDefined();
     expect(newUser.user.username).toBe(MOCK_USER.username);
     expect(newUser.user.email).toBe(MOCK_USER.email);
-
-    // Expect that newUser has a token
-    expect(newUser.token).toBeDefined();
   });
 
   it("should throw a duplicate email error if the email already used", async () => {

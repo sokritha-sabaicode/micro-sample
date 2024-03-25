@@ -11,12 +11,15 @@ export const SignUp = async (
   try {
     const { username, email, password } = req.body as UserSignUpSchemaType;
 
+    // Save User
     const userService = new UserService();
     const newUser = await userService.SignUp({ username, email, password });
 
+    // Send Email Verification
+    await userService.SendVerifyEmailToken({ userId: newUser.user._id });
+
     res.status(StatusCode.Created).json({
       data: newUser.user,
-      token: newUser.token,
     });
   } catch (error) {
     _next(error);

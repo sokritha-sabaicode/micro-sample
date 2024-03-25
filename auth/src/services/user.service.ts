@@ -1,6 +1,9 @@
-import { IUser } from "../database/models/user.model";
+import AccountVerificationModel from "../database/models/account-verification.model";
 import UserRepository from "../database/repository/user-repository";
+import APIError from "../errors/api-error";
 import { UserSignUpSchemaType } from "../schema/@types/user";
+import { generateEmailVerificationToken } from "../utils/account-verification";
+import EmailSender from "../utils/email-sender";
 import { generatePassword, generateSignature } from "../utils/jwt";
 import { UserSignUpResult } from "./@types/user-service.type";
 
@@ -33,12 +36,44 @@ class UserService {
         password: hashedPassword,
       });
 
-      // Generate JWT Token for User to Access
-      const token = await generateSignature({ email, _id: newUser._id });
-
       // Return Response
-      return { user: newUser, token };
+      return { user: newUser };
     } catch (error: unknown) {
+      throw error;
+    }
+  }
+
+  async SendVerifyEmailToken({ userId }: { userId: string }) {
+    // TODO
+    // 1. Generate Verify Token
+    // 2. Save the Verify Token in the Database
+    // 3. Get the Info User By Id
+    // 4. Send the Email to the User
+
+    try {
+      // Step 1
+      const emailVerificationToken = generateEmailVerificationToken();
+
+      // Step 2
+      const accountVerification = new AccountVerificationModel({
+        userId,
+        emailVerificationToken,
+      });
+      const newAccountVerification = await accountVerification.save();
+
+      // Step 3
+      const existedUser = await this.repository.FindUserById({ id: userId });
+      if (!existedUser) {
+        throw new APIError("User does not exist!");
+      }
+
+      // Step 4
+      const emailSender = EmailSender.getInstance();
+      emailSender.sendSignUpVerificationEmail({
+        toEmail: existedUser.email,
+        emailVerificationToken: newAccountVerification.emailVerificationToken,
+      });
+    } catch (error) {
       throw error;
     }
   }

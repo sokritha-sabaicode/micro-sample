@@ -25,13 +25,12 @@ describe("POST /signup", () => {
     };
 
     const response = await request(app)
-      .post("/auth/v1/signup")
+      .post("/v1/auth/signup")
       .send(MOCK_USER)
       .expect("Content-Type", /json/)
       .expect(201);
 
     expect(response.body.data.username).toBe(MOCK_USER.username);
     expect(response.body.data.email).toBe(MOCK_USER.email);
-    expect(response.body.token).toBeDefined();
   }, 50000);
 });
