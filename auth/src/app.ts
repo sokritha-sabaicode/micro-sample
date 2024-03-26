@@ -3,6 +3,8 @@ import { errorHandler } from "./middlewares";
 import AuthRouter from "./routes/v1/auth.router";
 import loggerMiddleware from "./middlewares/logger-handler";
 import redoc from "redoc-express";
+import swaggerUi from "swagger-ui-express";
+import * as swaggerDocument from "../public/swagger.json";
 
 const app = express();
 
@@ -22,11 +24,6 @@ app.use(loggerMiddleware);
 // ========================
 app.use("/v1", AuthRouter);
 
-// serve your swagger.json file
-app.get("/docs", (req, res) => {
-  res.sendFile(`swagger.json`, { root: "./public" });
-});
-
 // define title and specUrl location
 // serve redoc
 app.get(
@@ -34,10 +31,6 @@ app.get(
   redoc({
     title: "API Docs",
     specUrl: "/swagger.json",
-    nonce: "", // <= it is optional,we can omit this key and value
-    // we are now start supporting the redocOptions object
-    // you can omit the options object if you don't need it
-    // https://redocly.com/docs/api-reference-docs/configuration/functionality/
     redocOptions: {
       theme: {
         colors: {
@@ -61,6 +54,7 @@ app.get(
     },
   })
 );
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // ========================
 // Global Error Handler

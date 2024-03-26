@@ -42,7 +42,7 @@
 		}
 	},
 	"paths": {
-		"/auth/signup": {
+		"/v1/auth/signup": {
 			"post": {
 				"operationId": "SignUp",
 				"responses": {

@@ -13,7 +13,7 @@ interface SignUpRequestBody {
   // Add any other properties if present in the Zod schema
 }
 
-@Route("auth")
+@Route("v1/auth")
 export class AuthController {
   @Post("/signup")
   public async SignUp(@Body() requestBody: SignUpRequestBody): Promise<any> {

@@ -9,7 +9,8 @@
       "outDir": "./build",
       "strict": true,
       "experimentalDecorators": true,
-      "emitDecoratorMetadata": true
+      "emitDecoratorMetadata": true,
+      "resolveJsonModule": true
     },
   }
   
