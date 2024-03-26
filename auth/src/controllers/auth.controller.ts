@@ -1,27 +1,35 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, RequestHandler } from "express";
 import UserService from "../services/user.service";
 import { UserSignUpSchemaType } from "../schema/@types/user";
 import { StatusCode } from "../utils/consts";
+import { Route, Post, Response, Body, Middlewares } from "tsoa";
+import validateInput from "../middlewares/validate-input";
+import { UserSignUpSchema } from "../schema";
 
-export const SignUp = async (
-  req: Request,
-  res: Response,
-  _next: NextFunction
-) => {
-  try {
-    const { username, email, password } = req.body as UserSignUpSchemaType;
+interface SignUpRequestBody {
+  username: string;
+  email: string;
+  password: string;
+  // Add any other properties if present in the Zod schema
+}
 
-    // Save User
-    const userService = new UserService();
-    const newUser = await userService.SignUp({ username, email, password });
+@Route("auth")
+export class AuthController {
+  @Post("/signup")
+  public async SignUp(@Body() requestBody: SignUpRequestBody): Promise<any> {
+    try {
+      const { username, email, password } = requestBody;
 
-    // Send Email Verification
-    await userService.SendVerifyEmailToken({ userId: newUser.user._id });
+      // Save User
+      const userService = new UserService();
+      const newUser = await userService.SignUp({ username, email, password });
 
-    res.status(StatusCode.Created).json({
-      data: newUser.user,
-    });
-  } catch (error) {
-    _next(error);
+      // Send Email Verification
+      await userService.SendVerifyEmailToken({ userId: newUser.user._id });
+
+      return newUser.user;
+    } catch (error) {
+      throw error;
+    }
   }
-};
+}
