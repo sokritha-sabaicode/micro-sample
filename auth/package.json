@@ -5,10 +5,8 @@
   "license": "MIT",
   "description": "Authentication microservice for our micro sample app",
   "scripts": {
-    "start:dev": "concurrently \"yarn swagger:watch\" \"yarn serve\"",
-    "serve": "cross-env NODE_ENV=development nodemon src/index.ts",
+    "start:dev": "cross-env NODE_ENV=development nodemon src/index.ts",
     "swagger": "tsoa spec",
-    "swagger:watch": "nodemon --watch 'src/**/*' --exec 'yarn swagger'",
     "test": "jest --watchAll"
   },
   "jest": {

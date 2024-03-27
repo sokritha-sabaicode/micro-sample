@@ -37,7 +37,7 @@ class UserService {
       });
 
       // Return Response
-      return { user: newUser };
+      return newUser;
     } catch (error: unknown) {
       throw error;
     }

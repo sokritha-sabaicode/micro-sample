@@ -1,22 +1,20 @@
-import { NextFunction, RequestHandler } from "express";
 import UserService from "../services/user.service";
-import { UserSignUpSchemaType } from "../schema/@types/user";
-import { StatusCode } from "../utils/consts";
 import { Route, Post, Response, Body, Middlewares } from "tsoa";
 import validateInput from "../middlewares/validate-input";
-import { UserSignUpSchema } from "../schema";
+import { IUserDocument } from "../database/models/user.model";
 
 interface SignUpRequestBody {
   username: string;
   email: string;
   password: string;
-  // Add any other properties if present in the Zod schema
 }
 
 @Route("v1/auth")
 export class AuthController {
   @Post("/signup")
-  public async SignUp(@Body() requestBody: SignUpRequestBody): Promise<any> {
+  public async SignUp(
+    @Body() requestBody: SignUpRequestBody
+  ): Promise<IUserDocument> {
     try {
       const { username, email, password } = requestBody;
 
@@ -25,9 +23,9 @@ export class AuthController {
       const newUser = await userService.SignUp({ username, email, password });
 
       // Send Email Verification
-      await userService.SendVerifyEmailToken({ userId: newUser.user._id });
+      await userService.SendVerifyEmailToken({ userId: newUser._id });
 
-      return newUser.user;
+      return newUser;
     } catch (error) {
       throw error;
     }

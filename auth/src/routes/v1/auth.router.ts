@@ -3,6 +3,7 @@ import validateInput from "../../middlewares/validate-input";
 import { SIGNUP_ROUTE } from "./route-defs";
 import { UserSignUpSchema } from "../../schema";
 import { AuthController } from "../../controllers/auth.controller";
+import { StatusCode } from "../../utils/consts";
 
 const AuthRouter = express.Router();
 
@@ -15,7 +16,7 @@ AuthRouter.post(
       const requestBody = req.body;
       const response = await controller.SignUp(requestBody);
 
-      return res.send(response);
+      return res.status(StatusCode.Created).json(response);
     } catch (error) {
       _next(error);
     }
