@@ -30,7 +30,7 @@ describe("POST /signup", () => {
       .expect("Content-Type", /json/)
       .expect(201);
 
-    expect(response.body.data.username).toBe(MOCK_USER.username);
-    expect(response.body.data.email).toBe(MOCK_USER.email);
+    expect(response.body.username).toBe(MOCK_USER.username);
+    expect(response.body.email).toBe(MOCK_USER.email);
   }, 50000);
 });

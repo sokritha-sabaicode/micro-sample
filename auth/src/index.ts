@@ -20,7 +20,7 @@ async function run() {
     const config = createConfig(configPath);
 
     // Activate Logger
-    logInit({ env: config.env, logLevel: config.logLevel });
+    logInit({ env: process.env.NODE_ENV, logLevel: config.logLevel });
 
     // Activate Email Sender with EmailAPI [NodeMailer]
     const emailSender = EmailSender.getInstance();

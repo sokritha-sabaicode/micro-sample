@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import { errorHandler } from "./middlewares";
-import AuthRouter from "./routes/v1/auth.router";
 import loggerMiddleware from "./middlewares/logger-handler";
 import redoc from "redoc-express";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "../public/swagger.json";
+import { RegisterRoutes } from "./routes/v1/routes";
 
 const app = express();
 
@@ -22,12 +22,11 @@ app.use(loggerMiddleware);
 // ========================
 // Global API V1
 // ========================
-app.use("/v1", AuthRouter);
+RegisterRoutes(app);
 
-// define title and specUrl location
-// serve redoc
+// API Documentation
 app.get(
-  "/docs",
+  "/wiki-docs",
   redoc({
     title: "API Docs",
     specUrl: "/swagger.json",

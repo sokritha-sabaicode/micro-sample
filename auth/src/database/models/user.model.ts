@@ -1,5 +1,13 @@
 import mongoose, { Document, Model } from "mongoose";
 
+export interface IUser {
+  username: string;
+  email: string;
+  password: string;
+  phone: string;
+  isVerfied: boolean;
+}
+
 export interface IUserDocument extends Document {
   username: string;
   email: string;

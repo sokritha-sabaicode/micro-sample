@@ -1,7 +1,10 @@
 import UserService from "../services/user.service";
-import { Route, Post, Response, Body, Middlewares } from "tsoa";
+import { Route, Post, Body, Middlewares, SuccessResponse } from "tsoa";
 import validateInput from "../middlewares/validate-input";
-import { IUserDocument } from "../database/models/user.model";
+import { IUser } from "../database/models/user.model";
+import { UserSignUpSchema } from "../schema";
+import { StatusCode } from "../utils/consts";
+import { ROUTE_PATHS } from "../routes/v1/route-defs";
 
 interface SignUpRequestBody {
   username: string;
@@ -9,12 +12,12 @@ interface SignUpRequestBody {
   password: string;
 }
 
-@Route("v1/auth")
+@Route(ROUTE_PATHS.AUTH.BASE)
 export class AuthController {
-  @Post("/signup")
-  public async SignUp(
-    @Body() requestBody: SignUpRequestBody
-  ): Promise<IUserDocument> {
+  @SuccessResponse(StatusCode.Created, "Created")
+  @Post(ROUTE_PATHS.AUTH.SIGN_UP)
+  @Middlewares(validateInput(UserSignUpSchema))
+  public async SignUp(@Body() requestBody: SignUpRequestBody): Promise<IUser> {
     try {
       const { username, email, password } = requestBody;
 

@@ -18,7 +18,8 @@ export const logInit = ({
 }: {
   env: string | undefined;
   logLevel: string | undefined;
-  }) => {
+}) => {
+  console.log("env", env);
   // Output Logs to the Console (Unless it's Testing)
   logger.add(
     new winston.transports.Console({
@@ -26,7 +27,7 @@ export const logInit = ({
       silent: env === "testing",
     })
   );
-  
+
   if (env !== "development") {
     logger.add(
       new winston.transports.File({

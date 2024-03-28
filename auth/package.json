@@ -6,8 +6,10 @@
   "description": "Authentication microservice for our micro sample app",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon src/index.ts",
-    "swagger": "tsoa spec",
-    "test": "jest --watchAll"
+    "gen:spec": "tsoa spec",
+    "gen:routes": "tsoa routes",
+    "gen:all": "npm run gen:spec && npm run gen:routes",
+    "test": "cross-env NODE_ENV=testing jest --watchAll"
   },
   "jest": {
     "testEnvironment": "node",

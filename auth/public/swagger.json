@@ -7,6 +7,34 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"IUser": {
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"phone": {
+						"type": "string"
+					},
+					"isVerfied": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"username",
+					"email",
+					"password",
+					"phone",
+					"isVerfied"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"SignUpRequestBody": {
 				"properties": {
 					"username": {
@@ -42,15 +70,17 @@
 		}
 	},
 	"paths": {
-		"/v1/auth/signup": {
+		"/undefined/signup": {
 			"post": {
 				"operationId": "SignUp",
 				"responses": {
-					"200": {
-						"description": "Ok",
+					"201": {
+						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"$ref": "#/components/schemas/IUser"
+								}
 							}
 						}
 					}
