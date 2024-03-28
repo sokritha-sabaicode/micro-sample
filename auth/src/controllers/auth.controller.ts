@@ -1,10 +1,19 @@
 import UserService from "../services/user.service";
-import { Route, Post, Body, Middlewares, SuccessResponse } from "tsoa";
+import {
+  Route,
+  Post,
+  Body,
+  Middlewares,
+  SuccessResponse,
+  Query,
+  Get,
+} from "tsoa";
 import validateInput from "../middlewares/validate-input";
 import { IUser } from "../database/models/user.model";
 import { UserSignUpSchema } from "../schema";
 import { StatusCode } from "../utils/consts";
 import { ROUTE_PATHS } from "../routes/v1/route-defs";
+import { generateSignature } from "../utils/jwt";
 
 interface SignUpRequestBody {
   username: string;
@@ -12,7 +21,7 @@ interface SignUpRequestBody {
   password: string;
 }
 
-@Route(ROUTE_PATHS.AUTH.BASE)
+@Route("v1/auth")
 export class AuthController {
   @SuccessResponse(StatusCode.Created, "Created")
   @Post(ROUTE_PATHS.AUTH.SIGN_UP)
@@ -29,6 +38,26 @@ export class AuthController {
       await userService.SendVerifyEmailToken({ userId: newUser._id });
 
       return newUser;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @SuccessResponse(StatusCode.OK, "OK")
+  @Get(ROUTE_PATHS.AUTH.VERIFY)
+  public async VerifyEmail(@Query() token: string): Promise<{ token: string }> {
+    try {
+      const userService = new UserService();
+
+      // Verify the email token
+      const user = await userService.VerifyEmailToken({ token });
+
+      // Generate JWT for the verified user
+      const jwtToken = await generateSignature({
+        userId: user._id,
+      });
+
+      return { token: jwtToken };
     } catch (error) {
       throw error;
     }

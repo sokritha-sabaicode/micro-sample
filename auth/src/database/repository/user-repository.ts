@@ -1,3 +1,4 @@
+import { ObjectId } from "mongoose";
 import APIError from "../../errors/api-error";
 import DuplicateError from "../../errors/duplicate-error";
 import UserModel from "../models/user.model";
@@ -37,7 +38,7 @@ class UserRepository {
     }
   }
 
-  async FindUserById({ id }: { id: String }) {
+  async FindUserById({ id }: { id: string }) {
     try {
       const existingUser = await UserModel.findById(id);
 

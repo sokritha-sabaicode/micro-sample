@@ -56,7 +56,7 @@ export default class NodemailerEmailApi implements EmailApi {
     const { emailVerificationToken } = args;
 
     // TODO: this url will change once we integrate kubernetes in our application
-    return `http://localhost:3000/v1/auth/verify/${emailVerificationToken}`;
+    return `http://localhost:3000/v1/auth/verify?token=${emailVerificationToken}`;
   };
 
   private buildSignUpVerificationEmailTextBody = (

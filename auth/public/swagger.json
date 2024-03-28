@@ -70,7 +70,7 @@
 		}
 	},
 	"paths": {
-		"/undefined/signup": {
+		"/v1/auth/signup": {
 			"post": {
 				"operationId": "SignUp",
 				"responses": {
@@ -97,6 +97,42 @@
 						}
 					}
 				}
+			}
+		},
+		"/v1/auth/verify": {
+			"get": {
+				"operationId": "VerifyEmail",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"token": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"token"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		}
 	},
