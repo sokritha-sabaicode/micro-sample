@@ -41,7 +41,7 @@ class UserService {
           email: userDetails.email,
         });
 
-        if (!existedUser?.isVerfied) {
+        if (!existedUser?.isVerified) {
           // Resent the token
           await this.SendVerifyEmailToken({ userId: existedUser?._id });
         }
@@ -110,7 +110,7 @@ class UserService {
     }
 
     // Mark the user's email as verified
-    user.isVerfied = true;
+    user.isVerified = true;
     await user.save();
 
     // Remove the verification token

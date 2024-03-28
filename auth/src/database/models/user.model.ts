@@ -5,7 +5,7 @@ export interface IUser {
   email: string;
   password: string;
   phone: string;
-  isVerfied: boolean;
+  isVerified: boolean;
 }
 
 export interface IUserDocument extends Document {
@@ -13,7 +13,7 @@ export interface IUserDocument extends Document {
   email: string;
   password: string;
   phone: string;
-  isVerfied: boolean;
+  isVerified: boolean;
 }
 
 export interface IUserModel extends Model<IUserDocument> {}
