@@ -25,7 +25,7 @@ export const validatePassword = async ({
 export const generateSignature = async (payload: object): Promise<string> => {
   try {
     return await jwt.sign(payload, process.env.APP_SECRET as string, {
-      expiresIn: "30d",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
   } catch (error) {
     throw new APIError("Unable to generate signature from jwt");

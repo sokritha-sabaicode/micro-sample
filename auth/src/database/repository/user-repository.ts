@@ -34,7 +34,7 @@ class UserRepository {
       const existingUser = await UserModel.findOne({ email: email });
       return existingUser;
     } catch (error) {
-      return null;
+      throw new APIError("Unable to Find User in Database");
     }
   }
 

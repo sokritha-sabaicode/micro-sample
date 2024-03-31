@@ -10,13 +10,18 @@ import {
 } from "tsoa";
 import validateInput from "../middlewares/validate-input";
 import { IUser } from "../database/models/user.model";
-import { UserSignUpSchema } from "../schema";
+import { UserSignInSchema, UserSignUpSchema } from "../schema";
 import { StatusCode } from "../utils/consts";
 import { ROUTE_PATHS } from "../routes/v1/route-defs";
 import { generateSignature } from "../utils/jwt";
 
 interface SignUpRequestBody {
   username: string;
+  email: string;
+  password: string;
+}
+
+interface LoginRequestBody {
   email: string;
   password: string;
 }
@@ -58,6 +63,26 @@ export class AuthController {
       });
 
       return { token: jwtToken };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @SuccessResponse(StatusCode.OK, "OK")
+  @Post(ROUTE_PATHS.AUTH.LOGIN)
+  @Middlewares(validateInput(UserSignInSchema))
+  public async LoginWithEmail(
+    @Body() requestBody: LoginRequestBody
+  ): Promise<{ token: string }> {
+    try {
+      const { email, password } = requestBody;
+
+      const userService = new UserService();
+      const jwtToken = await userService.Login({ email, password });
+
+      return {
+        token: jwtToken,
+      };
     } catch (error) {
       throw error;
     }

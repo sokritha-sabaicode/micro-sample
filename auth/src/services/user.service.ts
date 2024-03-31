@@ -3,11 +3,18 @@ import { AccountVerificationRepository } from "../database/repository/account-ve
 import UserRepository from "../database/repository/user-repository";
 import APIError from "../errors/api-error";
 import DuplicateError from "../errors/duplicate-error";
-import { UserSignUpSchemaType } from "../schema/@types/user";
+import {
+  UserSignInSchemaType,
+  UserSignUpSchemaType,
+} from "../schema/@types/user";
 import { generateEmailVerificationToken } from "../utils/account-verification";
 import { StatusCode } from "../utils/consts";
 import EmailSender from "../utils/email-sender";
-import { generatePassword, generateSignature } from "../utils/jwt";
+import {
+  generatePassword,
+  generateSignature,
+  validatePassword,
+} from "../utils/jwt";
 import { UserSignUpResult } from "./@types/user-service.type";
 
 class UserService {
@@ -117,6 +124,38 @@ class UserService {
     await this.accountVerificationRepo.DeleteVerificationToken({ token });
 
     return user;
+  }
+
+  async Login(userDetails: UserSignInSchemaType) {
+    // TODO:
+    // 1. Find user by email
+    // 2. Validate the password
+    // 3. Generate Token & Return
+
+    // Step 1
+    const user = await this.userRepo.FindUser({ email: userDetails.email });
+
+    if (!user) {
+      throw new APIError("User not exist", StatusCode.NotFound);
+    }
+
+    // Step 2
+    const isPwdCorrect = await validatePassword({
+      enteredPassword: userDetails.password,
+      savedPassword: user.password,
+    });
+
+    if (!isPwdCorrect) {
+      throw new APIError(
+        "Email or Password is incorrect",
+        StatusCode.BadRequest
+      );
+    }
+
+    // Step 3
+    const token = await generateSignature({ userId: user._id });
+
+    return token;
   }
   /**
    * Find a user by their email.
