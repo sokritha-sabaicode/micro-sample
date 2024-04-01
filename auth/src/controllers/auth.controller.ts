@@ -7,8 +7,6 @@ import {
   SuccessResponse,
   Query,
   Get,
-  Request,
-  Response,
 } from "tsoa";
 import validateInput from "../middlewares/validate-input";
 import { IUser } from "../database/models/user.model";
@@ -17,7 +15,6 @@ import { StatusCode } from "../utils/consts";
 import { ROUTE_PATHS } from "../routes/v1/route-defs";
 import { generateSignature } from "../utils/jwt";
 import passport from "passport";
-import APIError from "../errors/api-error";
 
 interface SignUpRequestBody {
   username: string;
@@ -93,18 +90,14 @@ export class AuthController {
   }
 
   @SuccessResponse(StatusCode.OK, "OK")
-  @Post(ROUTE_PATHS.AUTH.GOOGLE)
-  public async GoogleAuth() {
-    passport.authenticate("google", { scope: ["email"] });
-  }
+  @Get(ROUTE_PATHS.AUTH.GOOGLE)
+  @Middlewares(passport.authenticate("google", { scope: ["email"] }))
+  public GoogleAuth() {}
 
   @SuccessResponse(StatusCode.OK, "OK")
-  @Post(ROUTE_PATHS.AUTH.GOOGLE_CALLBACK)
+  @Get(ROUTE_PATHS.AUTH.GOOGLE_CALLBACK)
+  @Middlewares()
   public async GoogleAuthCallback() {
-    passport.authenticate("google", (err: unknown, user: any) => {
-      if (err || !user) {
-        throw new APIError("Authentication Failed", StatusCode.BadRequest);
-      }
-    });
+    passport.authenticate("google");
   }
 }
