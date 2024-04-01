@@ -7,6 +7,8 @@ import {
   SuccessResponse,
   Query,
   Get,
+  Request,
+  Response,
 } from "tsoa";
 import validateInput from "../middlewares/validate-input";
 import { IUser } from "../database/models/user.model";
@@ -14,6 +16,8 @@ import { UserSignInSchema, UserSignUpSchema } from "../schema";
 import { StatusCode } from "../utils/consts";
 import { ROUTE_PATHS } from "../routes/v1/route-defs";
 import { generateSignature } from "../utils/jwt";
+import passport from "passport";
+import APIError from "../errors/api-error";
 
 interface SignUpRequestBody {
   username: string;
@@ -86,5 +90,21 @@ export class AuthController {
     } catch (error) {
       throw error;
     }
+  }
+
+  @SuccessResponse(StatusCode.OK, "OK")
+  @Post(ROUTE_PATHS.AUTH.GOOGLE)
+  public async GoogleAuth() {
+    passport.authenticate("google", { scope: ["email"] });
+  }
+
+  @SuccessResponse(StatusCode.OK, "OK")
+  @Post(ROUTE_PATHS.AUTH.GOOGLE_CALLBACK)
+  public async GoogleAuthCallback() {
+    passport.authenticate("google", (err: unknown, user: any) => {
+      if (err || !user) {
+        throw new APIError("Authentication Failed", StatusCode.BadRequest);
+      }
+    });
   }
 }

@@ -3,7 +3,6 @@ import mongoose, { Document, Model } from "mongoose";
 export interface IUser {
   username: string;
   email: string;
-  password: string;
   phone: string;
   isVerified: boolean;
 }
@@ -11,9 +10,10 @@ export interface IUser {
 export interface IUserDocument extends Document {
   username: string;
   email: string;
-  password: string;
+  password?: string;
   phone: string;
   isVerified: boolean;
+  googleId?: string;
 }
 
 export interface IUserModel extends Model<IUserDocument> {}
@@ -28,12 +28,17 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
   },
   {
     toJSON: {
       transform(doc, ret) {
         delete ret.password;
-        delete ret.salt;
+        delete ret.googleId;
         delete ret.__v;
       },
     },

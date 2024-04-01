@@ -5,6 +5,7 @@ import redoc from "redoc-express";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "../public/swagger.json";
 import { RegisterRoutes } from "./routes/v1/routes";
+import passport from "passport";
 
 const app = express();
 
@@ -18,6 +19,9 @@ app.use(express.static("public"));
 
 // Logger
 app.use(loggerMiddleware);
+
+// Passport
+app.use(passport.initialize());
 
 // ========================
 // Global API V1
