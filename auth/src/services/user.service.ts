@@ -1,4 +1,5 @@
 import AccountVerificationModel from "../database/models/account-verification.model";
+import { IUserDocument } from "../database/models/user.model";
 import { AccountVerificationRepository } from "../database/repository/account-verification-repository";
 import UserRepository from "../database/repository/user-repository";
 import APIError from "../errors/api-error";
@@ -15,7 +16,7 @@ import {
   generateSignature,
   validatePassword,
 } from "../utils/jwt";
-import { UserSignUpResult } from "./@types/user-service.type";
+import { UserSignUpParams, UserSignUpResult } from "./@types/user-service.type";
 
 class UserService {
   private userRepo: UserRepository;
@@ -26,19 +27,20 @@ class UserService {
     this.accountVerificationRepo = new AccountVerificationRepository();
   }
 
-  async SignUp(userDetails: UserSignUpSchemaType): Promise<UserSignUpResult> {
+  async SignUp(userDetails: UserSignUpParams): Promise<UserSignUpResult> {
     try {
-      const { username, email, password } = userDetails;
+      // If user signup with email & password, Convert User Password to Hash Password
+      const hashedPassword =
+        userDetails.password && (await generatePassword(userDetails.password));
 
-      // Convert User Password to Hash Password
-      const hashedPassword = await generatePassword(password);
+      let newUserParams = { ...userDetails };
+
+      if (hashedPassword) {
+        newUserParams = { ...newUserParams, password: hashedPassword };
+      }
 
       // Save User to Database
-      const newUser = await this.userRepo.CreateUser({
-        username,
-        email,
-        password: hashedPassword,
-      });
+      const newUser = await this.userRepo.CreateUser(newUserParams);
 
       // Return Response
       return newUser;
@@ -142,7 +144,7 @@ class UserService {
     // Step 2
     const isPwdCorrect = await validatePassword({
       enteredPassword: userDetails.password,
-      savedPassword: user.password,
+      savedPassword: user.password as string,
     });
 
     if (!isPwdCorrect) {
@@ -157,45 +159,28 @@ class UserService {
 
     return token;
   }
-  /**
-   * Find a user by their email.
-   *
-   * @param {string} email - The email of the user to find.
-   * @returns {Promise<Object|null>} The found user or null if not found.
-   */
-  // async findUserByEmail(email) {
-  //   const user = await db.User.findOne({ where: { email } });
-  //   return user;
-  // }
 
-  /**
-   * Update user information.
-   *
-   * @param {number} userId - The ID of the user to update.
-   * @param {Object} updates - The updates to apply to the user.
-   * @returns {Promise<Object>} The updated user.
-   */
+  async FindUserByEmail({ email }: { email: string }) {
+    try {
+      const user = await this.userRepo.FindUser({ email });
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
 
-  // async updateUser(userId, updates) {
-  //   const user = await db.User.findByPk(userId);
-  //   if (!user) {
-  //     throw new Error("User not found");
-  //   }
-  //   const updatedUser = await user.update(updates);
-  //   return updatedUser;
-  // }
-
-  /**
-   * Delete a user by their ID.
-   *
-   * @param {number} userId - The ID of the user to delete.
-   * @returns {Promise<boolean>} True if the user was deleted, false otherwise.
-   */
-
-  // async deleteUser(userId) {
-  //   const deleted = await db.User.destroy({ where: { id: userId } });
-  //   return deleted;
-  // }
+  async UpdateUser({ id, updates }: { id: string; updates: object }) {
+    try {
+      const user = await this.userRepo.FindUserById({ id });
+      if (!user) {
+        throw new APIError("User does not exist", StatusCode.NotFound);
+      }
+      const updatedUser = await this.userRepo.UpdateUserById({ id, updates });
+      return updatedUser;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default UserService;

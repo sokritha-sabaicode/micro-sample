@@ -50,10 +50,10 @@ class UserRepository {
 
   async UpdateUserById({
     id,
-    newInfo,
+    updates,
   }: {
     id: string;
-    newInfo: UserUpdateRepository;
+    updates: UserUpdateRepository;
   }) {
     try {
       const isExist = await this.FindUserById({ id });
@@ -61,7 +61,7 @@ class UserRepository {
         throw new APIError("User does not exist", StatusCode.NotFound);
       }
 
-      const newUpdateUser = await UserModel.findByIdAndUpdate(id, newInfo, {
+      const newUpdateUser = await UserModel.findByIdAndUpdate(id, updates, {
         new: true,
       });
 

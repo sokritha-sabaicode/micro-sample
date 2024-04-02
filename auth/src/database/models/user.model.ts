@@ -3,16 +3,16 @@ import mongoose, { Document, Model } from "mongoose";
 export interface IUser {
   username: string;
   email: string;
-  phone: string;
-  isVerified: boolean;
+  phone?: string;
+  isVerified?: boolean;
 }
 
 export interface IUserDocument extends Document {
   username: string;
   email: string;
   password?: string;
-  phone: string;
-  isVerified: boolean;
+  phone?: string;
+  isVerified?: boolean;
   googleId?: string;
 }
 
