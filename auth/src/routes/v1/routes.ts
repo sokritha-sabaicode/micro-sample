@@ -16,8 +16,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "username": {"dataType":"string","required":true},
             "email": {"dataType":"string","required":true},
-            "phone": {"dataType":"string","required":true},
-            "isVerified": {"dataType":"boolean","required":true},
+            "phone": {"dataType":"string"},
+            "isVerified": {"dataType":"boolean"},
         },
         "additionalProperties": false,
     },

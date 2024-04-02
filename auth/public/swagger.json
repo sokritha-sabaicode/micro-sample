@@ -24,9 +24,7 @@
 				},
 				"required": [
 					"username",
-					"email",
-					"phone",
-					"isVerified"
+					"email"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -220,7 +218,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {},
+									"properties": {
+										"token": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"token"
+									],
 									"type": "object"
 								}
 							}
