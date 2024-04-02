@@ -53,12 +53,18 @@ class UserService {
         if (!existedUser?.isVerified) {
           // Resent the token
           await this.SendVerifyEmailToken({ userId: existedUser?._id });
+          // Throw or handle the error based on your application's needs
+          throw new APIError(
+            "A user with this email already exists. Verification email resent.",
+            StatusCode.Conflict
+          );
+        } else {
+          // This could be the case that user had sign in via oauth before
+          throw new APIError(
+            "A user with this email already exists. Please try with another methods.",
+            StatusCode.Conflict
+          );
         }
-
-        // Throw or handle the error based on your application's needs
-        throw new APIError(
-          "A user with this email already exists. Verification email resent."
-        );
       }
       throw error;
     }

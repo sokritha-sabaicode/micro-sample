@@ -127,7 +127,7 @@ export class AuthController {
         if (!existingUser.googleId) {
           await userService.UpdateUser({
             id: existingUser._id,
-            updates: { googleId: profile.data.id },
+            updates: { googleId: profile.data.id, isVerified: true },
           });
         }
 

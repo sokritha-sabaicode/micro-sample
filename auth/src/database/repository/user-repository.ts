@@ -22,6 +22,7 @@ class UserRepository {
       const userResult = await user.save();
       return userResult;
     } catch (error) {
+      console.log("error", error);
       if (error instanceof DuplicateError) {
         throw error;
       }
