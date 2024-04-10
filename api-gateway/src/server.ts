@@ -3,15 +3,17 @@ import path = require("path");
 import createConfig from "./utils/createConfig";
 import { logger } from "./utils/logger";
 
+export const config = (() => {
+  const currentEnv = process.env.NODE_ENV || "development";
+  const configPath =
+    currentEnv === "development"
+      ? path.join(__dirname, `../configs/.env`)
+      : path.join(__dirname, `../configs/.env.${currentEnv}`);
+  return createConfig(configPath);
+})();
+
 async function run() {
   try {
-    const currentEnv = process.env.NODE_ENV || "development";
-    const configPath =
-      currentEnv === "development"
-        ? path.join(__dirname, `../configs/.env`)
-        : path.join(__dirname, `../configs/.env.${currentEnv}`);
-    const config = createConfig(configPath);
-
     // Start Server
     const server = app.listen(config.port, () => {
       logger.info("Server is listening on port: ", config.port);
@@ -50,3 +52,5 @@ async function run() {
     });
   } catch (error) {}
 }
+
+run();

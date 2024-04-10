@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import { errorHandler } from "./middlewares";
 import loggerMiddleware from "./middlewares/logger-handler";
 import redoc from "redoc-express";

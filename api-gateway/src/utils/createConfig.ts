@@ -18,6 +18,7 @@ function createConfig(configPath: string) {
     env: process.env.NODE_ENV,
     port: process.env.PORT,
     auth_service_url: process.env.AUTH_SERVICE_URL,
+    frontend_url: process.env.FRONTEND_URL,
   };
 }
 
