@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import applyProxy from "./middlewares/proxy";
-import { config } from "./server";
+import { config } from "./index";
 import { applyRateLimit } from "./middlewares/rate-limit";
 
 const app = express();

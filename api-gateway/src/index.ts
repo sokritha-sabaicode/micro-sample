@@ -1,22 +1,28 @@
-import app from "./app";
 import path = require("path");
 import createConfig from "./utils/createConfig";
 import { logger } from "./utils/logger";
 
-export const config = (() => {
+// ===================== Initialize Config ==========================
+const getConfig = () => {
   const currentEnv = process.env.NODE_ENV || "development";
   const configPath =
     currentEnv === "development"
       ? path.join(__dirname, `../configs/.env`)
       : path.join(__dirname, `../configs/.env.${currentEnv}`);
   return createConfig(configPath);
-})();
+};
+export const config = getConfig();
+// ==================================================================
+
+import app from "./app";
 
 async function run() {
   try {
     // Start Server
+    console.log(config.port);
+
     const server = app.listen(config.port, () => {
-      logger.info("Server is listening on port: ", config.port);
+      logger.info(`Server is listening on port: ${config.port}`);
     });
 
     const exitHandler = async () => {
@@ -50,7 +56,10 @@ async function run() {
         server.close();
       }
     });
-  } catch (error) {}
+  } catch (error) {
+    logger.error("Failed to initialize application", { error });
+    process.exit(1);
+  }
 }
 
 run();
