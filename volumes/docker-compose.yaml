@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  redis:
+    container_name: redis_container # use container to access redis service
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --loglevel warning
+    # storage for storing data in redis
+    volumes:
+      - ./docker-volumes/cache:/data # data will store in ./docker-volumes/cache
