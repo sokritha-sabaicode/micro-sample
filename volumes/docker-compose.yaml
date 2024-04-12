@@ -10,3 +10,21 @@ services:
     # storage for storing data in redis
     volumes:
       - ./docker-volumes/cache:/data # data will store in ./docker-volumes/cache
+  # Service Database Name
+  mongodb:
+    container_name: mongodb_container
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./docker-volumes/data:/data/db
+  rabbitmq:
+    container_name: rabbitmq_container
+    image: rabbitmq:3.13-rc-management-alpine
+    restart: always
+    ports:
+      # AMQP protocol port
+      - "5672:5672"
+      # Management UI
+      - "15672:15672"

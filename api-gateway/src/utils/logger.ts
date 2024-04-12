@@ -3,7 +3,7 @@ import path from "path";
 
 // Create a Winston Logger
 export const logger = winston.createLogger({
-  defaultMeta: { service: "auth-service" },
+  defaultMeta: { service: "api-gateway-service" },
   // Add a timestamp to each log message & format in JSON
   format: winston.format.combine(
     winston.format.timestamp(),
