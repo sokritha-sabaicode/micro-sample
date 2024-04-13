@@ -27,9 +27,15 @@ class UserService {
     this.accountVerificationRepo = new AccountVerificationRepository();
   }
 
-  async SignUp(userDetails: UserSignUpParams): Promise<UserSignUpResult> {
+  // NOTE: THIS METHOD WILL USE BY SIGNUP WITH EMAIL & OAUTH
+  async Create(userDetails: UserSignUpParams): Promise<UserSignUpResult> {
     try {
-      // If user signup with email & password, Convert User Password to Hash Password
+      // TODO:
+      // 1. Hash The Password If Register With Email
+      // 2. Save User to DB
+      // 3. If Error, Check Duplication
+
+      // Step 1
       const hashedPassword =
         userDetails.password && (await generatePassword(userDetails.password));
 
@@ -39,12 +45,12 @@ class UserService {
         newUserParams = { ...newUserParams, password: hashedPassword };
       }
 
-      // Save User to Database
+      // Step 2
       const newUser = await this.userRepo.CreateUser(newUserParams);
 
-      // Return Response
       return newUser;
     } catch (error: unknown) {
+      // Step 3
       if (error instanceof DuplicateError) {
         const existedUser = await this.userRepo.FindUser({
           email: userDetails.email,

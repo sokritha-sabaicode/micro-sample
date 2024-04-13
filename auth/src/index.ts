@@ -1,24 +1,31 @@
-import app from "./app";
 import path from "path";
 import createConfig from "./utils/config";
 import { logInit, logger } from "./utils/logger";
 import EmailSender from "./utils/email-sender";
 import NodemailerEmailApi from "./utils/nodemailer-email-api";
 import MongoDBConnector from "./database";
+import { Channel } from "amqplib";
+
+// ===================== Initialize Config ==========================
+const getConfig = () => {
+  const currentEnv = process.env.NODE_ENV || "development";
+  const configPath =
+    currentEnv === "development"
+      ? path.join(__dirname, `../configs/.env`)
+      : path.join(__dirname, `../configs/.env.${currentEnv}`);
+  return createConfig(configPath);
+};
+export const config = getConfig();
+// ==================================================================
+
+// NOTE: NEED TO IMPORT APP UNDER CONFIG SO THAT COULD ACCESS TO VARIABLE ENV
+import app from "./app";
+import { createQueueConnection } from "./queues/connection";
+
+export let authChannel: Channel;
 
 async function run() {
   try {
-    const currentEnv = process.env.NODE_ENV || "development";
-    const configPath = path.join(
-      __dirname,
-      currentEnv === "development"
-        ? "../configs/.env"
-        : currentEnv === "staging"
-        ? "../configs/.env.staging"
-        : "../configs/.env.production"
-    );
-    const config = createConfig(configPath);
-
     // Activate Logger
     logInit({ env: process.env.NODE_ENV, logLevel: config.logLevel });
 
@@ -30,6 +37,9 @@ async function run() {
     // Activate Database
     const mongodb = MongoDBConnector.getInstance();
     await mongodb.connect({ url: config.mongo.url as string });
+
+    // Activate RabbitMQ
+    authChannel = (await createQueueConnection()) as Channel;
 
     // Start Server
     const server = app.listen(config.port, () => {

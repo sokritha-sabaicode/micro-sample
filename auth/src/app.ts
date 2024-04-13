@@ -5,15 +5,35 @@ import redoc from "redoc-express";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "../public/swagger.json";
 import { RegisterRoutes } from "./routes/v1/routes";
+import hpp from "hpp";
+import helmet from "helmet";
+import cors from "cors";
+import { config } from ".";
+import compression from "compression";
+import { urlencoded } from "body-parser";
 
 const app = express();
 
 // =======================
-// Global Middlewares
+// Security Middlewares
 // =======================
+app.set("trust proxy", 1);
+app.use(hpp());
+app.use(helmet());
+app.use(
+  cors({
+    origin: config.apiGateway,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  })
+);
 
-// Access Request Body (JSON)
-app.use(express.json());
+// =======================
+// Standard Middleware
+// =======================
+app.use(compression());
+app.use(express.json({ limit: "200mb" }));
+app.use(urlencoded({ extended: true, limit: "200mb" }));
 app.use(express.static("public"));
 
 // Logger

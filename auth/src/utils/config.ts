@@ -22,6 +22,9 @@ function createConfig(configPath: string) {
       url: process.env.MONGODB_URL,
     },
     logLevel: process.env.LOG_LEVEL,
+    apiGateway: process.env.API_GATEWAY,
+    jwtToken: process.env.JWT_TOKEN,
+    rabbitMQ: process.env.RABBIT_MQ,
   };
 }
 

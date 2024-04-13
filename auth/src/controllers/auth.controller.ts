@@ -15,6 +15,8 @@ import { StatusCode } from "../utils/consts";
 import { ROUTE_PATHS } from "../routes/v1/route-defs";
 import { generateSignature } from "../utils/jwt";
 import axios from "axios";
+import { publishDirectMessage } from "../queues/auth.producer";
+import { authChannel } from "..";
 
 interface SignUpRequestBody {
   username: string;
@@ -32,16 +34,36 @@ export class AuthController {
   @SuccessResponse(StatusCode.Created, "Created")
   @Post(ROUTE_PATHS.AUTH.SIGN_UP)
   @Middlewares(validateInput(UserSignUpSchema))
-  public async SignUp(@Body() requestBody: SignUpRequestBody): Promise<IUser> {
+  public async SignUpWithEmail(@Body() requestBody: SignUpRequestBody): Promise<IUser> {
     try {
+      // TODO:
+      // 1. Save User
+      // 2. Send User Detail to Notification Service
+      // 3. Send User Detail to User Service
+
       const { username, email, password } = requestBody;
 
       // Save User
       const userService = new UserService();
-      const newUser = await userService.SignUp({ username, email, password });
+      const newUser = await userService.Create({ username, email, password });
 
-      // Send Email Verification
+      // [Old Version] - Send Email Verification
       await userService.SendVerifyEmailToken({ userId: newUser._id });
+
+      const messageDetails = {
+        username: newUser.username,
+        email: newUser.email,
+        type: "auth",
+      };
+
+      // [New Version] - Publish To Notification Service / User Service
+      // await publishDirectMessage(
+      //   authChannel,
+      //   "micro-user-update",
+      //   "user",
+      //   JSON.stringify(messageDetails),
+      //   "User details sent to User Service"
+      // );
 
       return newUser;
     } catch (error) {
@@ -142,7 +164,7 @@ export class AuthController {
       }
 
       // No user exists with this email, create a new user
-      const newUser = await userService.SignUp({
+      const newUser = await userService.Create({
         username: profile.data.name,
         email: profile.data.email,
         isVerified: true,
