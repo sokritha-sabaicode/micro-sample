@@ -1,6 +1,6 @@
 import path = require("path");
 import createConfig from "./utils/createConfig";
-import { logger } from "./utils/logger";
+import { logInit, logger } from "./utils/logger";
 
 // ===================== Initialize Config ==========================
 const getConfig = () => {
@@ -18,11 +18,14 @@ import app from "./app";
 
 async function run() {
   try {
+    // Activate Logger
+    logInit({ env: process.env.NODE_ENV, logLevel: config.logLevel });
+
     // Start Server
-    console.log(config.port);
+    logger.info(`Gateway server has started with process id ${process.pid}`);
 
     const server = app.listen(config.port, () => {
-      logger.info(`Server is listening on port: ${config.port}`);
+      logger.info(`Gateway server is listening on port: ${config.port}`);
     });
 
     const exitHandler = async () => {
@@ -57,7 +60,7 @@ async function run() {
       }
     });
   } catch (error) {
-    logger.error("Failed to initialize application", { error });
+    logger.error("Gateway Service Failed", { error });
     process.exit(1);
   }
 }

@@ -2,6 +2,7 @@ import express from "express";
 import { createProxyMiddleware, Options } from "http-proxy-middleware";
 import { ROUTE_PATHS } from "../route-defs";
 import { config } from "../index";
+import { logger } from "../utils/logger";
 
 interface ProxyConfig {
   [context: string]: Options;
@@ -17,7 +18,7 @@ const proxyConfigs: ProxyConfig = {
     },
     on: {
       proxyReq: (proxyReq, req, res) => {
-        console.error(
+        logger.error(
           `Proxying request from: ${req.url} to: ${proxyReq.protocol}//${proxyReq.host}${proxyReq.path}`
         );
       },

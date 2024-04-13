@@ -28,3 +28,28 @@ services:
       - "5672:5672"
       # Management UI
       - "15672:15672"
+  gateway:
+    container_name: gateway_container
+    build:
+      context: ../api-gateway
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - 3000:3000
+    env_file: ../api-gateway/configs/.env
+    environment:
+      # OUTSOURCE SERVICE
+      - AUTH_SERVICE_URLAUTH_SERVICE_URL=http://localhost:3001
+      - CLIENT_URL=http://localhost:8000
+      # GATEWAY SERVICE
+      - NODE_ENV=development
+      - PORT=3000
+      # TOKEN (GENERATE BY YOUR OWN)
+      - GATEWAY_JWT_TOKEN=8869b23eddb18fd53992e47bfe8fada5
+      - JWT_TOKEN=bba49f8c489c0b81ee2b6b7a6a6128e6
+      - SECRET_KEY_ONE=1d043cdc92e73a6fc6ef35601574be9a
+      - SECRET_KEY_TWO=90a071f0dc2624e311fec81321f2f94e
+      # LOG SERVICE
+      - LOG_LEVEL=debug
+      # REDIS SERVICE
+      - REDIS_HOST=redis://redis_container:6379

@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start:dev": "cross-env NODE_ENV=development nodemon src/index.ts"
+    "start:dev": "cross-env NODE_ENV=development nodemon src/index.ts",
+    "gen:spec": "tsoa spec",
+    "gen:routes": "tsoa routes",
+    "gen:all": "npm run gen:spec && npm run gen:routes"
   },
   "license": "MIT",
   "dependencies": {
@@ -20,7 +23,7 @@
     "hpp": "^0.2.3",
     "http-proxy-middleware": "^3.0.0",
     "jsonwebtoken": "^9.0.2",
-    "pino-pretty": "^11.0.0",
+    "tsoa": "^6.2.0",
     "typescript-transform-paths": "^3.4.7",
     "winston": "^3.13.0"
   },

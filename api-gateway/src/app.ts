@@ -16,6 +16,7 @@ import compression from "compression";
 import { logger } from "./utils/logger";
 import { StatusCode } from "./utils/consts";
 import { errorHandler } from "./middlewares/error-handler";
+import { RegisterRoutes } from "./routes/routes";
 
 const app = express();
 
@@ -26,9 +27,9 @@ app.set("trust proxy", 1);
 app.use(
   cookieSession({
     name: "session",
-    keys: [],
+    keys: [`${config.secretKeyOne}`, `${config.secretKeyTwo}`],
     maxAge: 24 * 7 * 3600000,
-    secure: false, // update with value from config
+    secure: config.env !== "development", // update with value from config
     // sameSite: none
   })
 );
@@ -45,12 +46,12 @@ app.use(helmet());
 // Only Allow Specific Origin to Access API Gateway (Frontend)
 app.use(
   cors({
-    origin: [config.frontend_url as string],
+    origin: [config.client_url as string],
     credentials: true, // attach token from client
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
-); // Enable CORS
+);
 
 // Apply Limit Request
 applyRateLimit(app);
@@ -69,6 +70,11 @@ app.use(urlencoded({ limit: "200mb", extended: true }));
 // Proxy Routes
 // ===================
 applyProxy(app);
+
+// ===================
+// Gateway Health Routes
+// ===================
+RegisterRoutes(app);
 
 // ====================
 // Global Error Handler
