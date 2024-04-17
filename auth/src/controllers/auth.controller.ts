@@ -34,7 +34,9 @@ export class AuthController {
   @SuccessResponse(StatusCode.Created, "Created")
   @Post(ROUTE_PATHS.AUTH.SIGN_UP)
   @Middlewares(validateInput(UserSignUpSchema))
-  public async SignUpWithEmail(@Body() requestBody: SignUpRequestBody): Promise<IUser> {
+  public async SignUpWithEmail(
+    @Body() requestBody: SignUpRequestBody
+  ): Promise<any> {
     try {
       // TODO:
       // 1. Save User
@@ -51,21 +53,24 @@ export class AuthController {
       await userService.SendVerifyEmailToken({ userId: newUser._id });
 
       const messageDetails = {
-        username: newUser.username,
-        email: newUser.email,
-        type: "auth",
+        receiverEmail: newUser.email,
+        // verifyLink
+        template: "verifyEmail",
       };
 
       // [New Version] - Publish To Notification Service / User Service
-      // await publishDirectMessage(
-      //   authChannel,
-      //   "micro-user-update",
-      //   "user",
-      //   JSON.stringify(messageDetails),
-      //   "User details sent to User Service"
-      // );
+      await publishDirectMessage(
+        authChannel,
+        "email-notification",
+        "auth-email",
+        JSON.stringify(messageDetails),
+        "Verify email message has been sent to notification service"
+      );
 
-      return newUser;
+      return {
+        message: "User create successfully. Please verify your email.",
+        data: newUser,
+      };
     } catch (error) {
       throw error;
     }

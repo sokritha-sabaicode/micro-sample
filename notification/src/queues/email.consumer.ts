@@ -53,17 +53,14 @@ export async function consumeSubmissionEmailMessages(
     await channel.bindQueue(queue.queue, exchangeName, routingKey);
 
     channel.consume(queue.queue, async (msg: ConsumeMessage | null) => {
-      const { receiverEmail, username, verifyLink, resetLink, template } =
-        JSON.parse(msg!.content.toString());
+      const {receiverEmail, username, verifyLink, resetLink,template} = JSON.parse(msg!.content.toString());
       const locals = {
         appLink: `${getConfig().clientUrl}`,
         appIcon: '',
         username,
         verifyLink,
-        resetLink,
-      };
-
-      await 
+        resetLink
+      }
     });
   } catch (error) {
     logger.error(
