@@ -56,3 +56,25 @@ services:
       - LOG_LEVEL=debug
       # REDIS SERVICE
       - REDIS_HOST=redis://redis_container:6379
+  notification:
+    container_name: notification_container
+    build:
+      context: ../notification
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - 3009:3009
+    env_file: ../notification/configs/.env
+    environment:
+      - ENABLE_APM=0
+      - LOG_LEVEL=debug
+      - NODE_ENV=development
+      - PORT=3009
+      - CLIENT_URL=http://localhost:8000
+      - RABBITMQ_ENDPOINT=amqp://myuser:mypassword@rabbitmq_container:5672
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SENDER_EMAIL=sokritha.dev@gmail.com
+      - SENDER_EMAIL_PASSWORD=tcfvmngksishuhku
+    depends_on:
+      - rabbitmq

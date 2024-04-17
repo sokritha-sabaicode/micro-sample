@@ -25,6 +25,8 @@ export function getConfig() {
 // NOTE: NEED TO IMPORT APP UNDER CONFIG SO THAT COULD ACCESS TO VARIABLE ENV
 import app from './app';
 import { startQueue } from './queues/connection';
+import EmailSender from '@notifications/utils/email-sender';
+import NodemailerEmailApi from '@notifications/utils/nodemailer-email-api';
 
 async function run() {
   try {
@@ -32,6 +34,11 @@ async function run() {
 
     // Activate Logger
     logInit({ env: process.env.NODE_ENV, logLevel: config.logLevel });
+
+    // Activate Email Sender with EmailAPI [NodeMailer]
+    const emailSender = EmailSender.getInstance();
+    emailSender.activate();
+    emailSender.setEmailApi(new NodemailerEmailApi());
 
     // Activate RabbitMQ
     await startQueue();
@@ -58,7 +65,7 @@ async function run() {
     };
 
     const unexpectedErrorHandler = (error: unknown) => {
-      logger.error('unhandled error', { error });
+      logger.error(`unhandled error, ${error}`);
       exitHandler();
     };
 
@@ -75,9 +82,12 @@ async function run() {
       }
     });
   } catch (error) {
-    logger.error('Failed to initialize application', { error });
+    console.log(error);
+    logger.error(`Failed to initialize application ${error}`);
     process.exit(1);
   }
 }
 
-run();
+if (process.env.NODE_ENV !== 'testing') {
+  run();
+}

@@ -1,10 +1,7 @@
 import { getConfig } from '@notifications/server';
 import { logger } from '@notifications/utils/logger';
 import client, { Channel, Connection } from 'amqplib';
-import {
-  consumeAuthEmailMessages,
-  consumeSubmissionEmailMessages,
-} from './email.consumer';
+import { consumeAuthEmailMessages } from './email-consumer';
 
 export async function createQueueConnection(): Promise<Channel | undefined> {
   try {
@@ -36,30 +33,17 @@ function closeQueueConnection() {
 export async function startQueue(): Promise<void> {
   const emailChannel: Channel = (await createQueueConnection()) as Channel;
   await consumeAuthEmailMessages(emailChannel);
-  await consumeSubmissionEmailMessages(emailChannel);
+  // await consumeSubmissionEmailMessages(emailChannel);
 
-  await emailChannel.assertExchange('microsample-email-notification', 'direct');
-  await emailChannel.assertExchange(
-    'microsample-submission-notification',
-    'direct'
-  );
-
-  const message = JSON.stringify({
-    name: 'microsample',
-    service: 'notification service',
-  });
-  const message1 = JSON.stringify({
-    name: 'microsample',
-    service: 'notification service',
-  });
-  emailChannel.publish(
-    'microsample-email-notification',
-    'auth-email',
-    Buffer.from(message)
-  );
-  emailChannel.publish(
-    'microsample-submission-notification',
-    'submission-email',
-    Buffer.from(message1)
-  );
+  // await emailChannel.assertExchange('microsample-email-notification', 'direct');
+  // const message = JSON.stringify({
+  //   receiverEmail: `${getConfig().senderEmail}`,
+  //   verifyLink: `${getConfig().clientUrl}/verify?token=1234567890`,
+  //   template: 'verifyEmail',
+  // });
+  // emailChannel.publish(
+  //   'microsample-email-notification',
+  //   'auth-email',
+  //   Buffer.from(message)
+  // );
 }

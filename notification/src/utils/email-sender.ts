@@ -1,9 +1,5 @@
-import APIError from "../errors/api-error";
-import {
-  EmailApi,
-  EmailApiSendEmailResponse,
-  EmailApiSendSignUpVerificationEmailArgs,
-} from "./@types/email-sender.type";
+import APIError from '../errors/api-error';
+import { EmailApi, IEmailLocals } from './@types/email-sender.type';
 
 // ********************************
 // Singleton Pattern
@@ -42,21 +38,23 @@ export default class EmailSender implements EmailApi {
     this.emailApi = emailApi;
   }
 
-  async sendSignUpVerificationEmail(
-    args: EmailApiSendSignUpVerificationEmailArgs
-  ): Promise<EmailApiSendEmailResponse> {
+  async sendEmail(
+    template: string,
+    receiver: string,
+    locals: IEmailLocals
+  ): Promise<void> {
     this.validateEmailSender();
 
-    return (this.emailApi as EmailApi).sendSignUpVerificationEmail(args);
+    this.emailApi!.sendEmail(template, receiver, locals);
   }
 
   private validateEmailSender(): void {
     if (!this.isActive) {
-      throw new APIError("EmailSender is not active");
+      throw new APIError('EmailSender is not active');
     }
 
     if (!this.emailApi) {
-      throw new APIError("EmailApi is not set");
+      throw new APIError('EmailApi is not set');
     }
   }
 }
