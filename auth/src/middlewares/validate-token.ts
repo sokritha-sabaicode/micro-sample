@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
-import { config } from "..";
+import { config } from "../server";
 import APIError from "../errors/api-error";
 import { StatusCode } from "../utils/consts";
 

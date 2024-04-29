@@ -1,12 +1,17 @@
 {
   "name": "api-gateway",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start:dev": "cross-env NODE_ENV=development nodemon src/index.ts",
+    "start:dev": "cross-env NODE_ENV=development nodemon -r tsconfig-paths/register src/server.ts",
+    "start": "cross-env NODE_ENV=production pm2 start ./build/src/server.js -i 5 --attach --watch",
+    "stop": "pm2 stop all",
+    "delete": "pm2 delete all",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "gen:spec": "tsoa spec",
     "gen:routes": "tsoa routes",
-    "gen:all": "npm run gen:spec && npm run gen:routes"
+    "gen:all": "npm run gen:spec && npm run gen:routes",
+    "test": "jest --coverage=true -w=1 --forceExit --detectOpenHandles --watchAll=false"
   },
   "license": "MIT",
   "dependencies": {

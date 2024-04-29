@@ -1,21 +1,21 @@
 import AccountVerificationModel from "../database/models/account-verification.model";
-import { IUserDocument } from "../database/models/user.model";
 import { AccountVerificationRepository } from "../database/repository/account-verification-repository";
 import UserRepository from "../database/repository/user-repository";
 import APIError from "../errors/api-error";
 import DuplicateError from "../errors/duplicate-error";
+import { publishDirectMessage } from "../queues/auth.producer";
 import {
   UserSignInSchemaType,
-  UserSignUpSchemaType,
 } from "../schema/@types/user";
+import { authChannel } from "../server";
 import { generateEmailVerificationToken } from "../utils/account-verification";
 import { StatusCode } from "../utils/consts";
-import EmailSender from "../utils/email-sender";
 import {
   generatePassword,
   generateSignature,
   validatePassword,
 } from "../utils/jwt";
+import { logger } from "../utils/logger";
 import { UserSignUpParams, UserSignUpResult } from "./@types/user-service.type";
 
 class UserService {
@@ -28,13 +28,14 @@ class UserService {
   }
 
   // NOTE: THIS METHOD WILL USE BY SIGNUP WITH EMAIL & OAUTH
+  // TODO:
+  // 1. Hash The Password If Register With Email
+  // 2. Save User to DB
+  // 3. If Error, Check Duplication
+  // 3.1. Duplication case 1: Sign Up Without Verification
+  // 3.2. Duplication case 2: Sign Up With The Same Email
   async Create(userDetails: UserSignUpParams): Promise<UserSignUpResult> {
     try {
-      // TODO:
-      // 1. Hash The Password If Register With Email
-      // 2. Save User to DB
-      // 3. If Error, Check Duplication
-
       // Step 1
       const hashedPassword =
         userDetails.password && (await generatePassword(userDetails.password));
@@ -58,16 +59,36 @@ class UserService {
 
         if (!existedUser?.isVerified) {
           // Resent the token
-          await this.SendVerifyEmailToken({ userId: existedUser?._id });
+          const token = await this.accountVerificationRepo.FindVerificationTokenById({ id: existedUser!._id });
+
+          if (!token) {
+            logger.error(`UserService Create() method error: token not found!`)
+            throw new APIError(`Something went wrong!`, StatusCode.InternalServerError)
+          }
+
+          const messageDetails = {
+            receiverEmail: existedUser!.email,
+            verifyLink: `${token.emailVerificationToken}`,
+            template: "verifyEmail",
+          };
+    
+          // Publish To Notification Service
+          await publishDirectMessage(
+            authChannel,
+            "email-notification",
+            "auth-email",
+            JSON.stringify(messageDetails),
+            "Verify email message has been sent to notification service"
+          );
+
           // Throw or handle the error based on your application's needs
           throw new APIError(
             "A user with this email already exists. Verification email resent.",
             StatusCode.Conflict
           );
         } else {
-          // This could be the case that user had sign in via oauth before
           throw new APIError(
-            "A user with this email already exists. Please try with another methods.",
+            "A user with this email already exists. Please login.",
             StatusCode.Conflict
           );
         }
@@ -76,13 +97,10 @@ class UserService {
     }
   }
 
-  async SendVerifyEmailToken({ userId }: { userId: string }) {
-    // TODO
-    // 1. Generate Verify Token
-    // 2. Save the Verify Token in the Database
-    // 3. Get the Info User By Id
-    // 4. Send the Email to the User
-
+  // TODO
+  // 1. Generate Verify Token
+  // 2. Save the Verify Token in the Database
+  async SaveVerificationToken({ userId }: { userId: string }) {
     try {
       // Step 1
       const emailVerificationToken = generateEmailVerificationToken();
@@ -92,20 +110,9 @@ class UserService {
         userId,
         emailVerificationToken,
       });
+
       const newAccountVerification = await accountVerification.save();
-
-      // Step 3
-      const existedUser = await this.userRepo.FindUserById({ id: userId });
-      if (!existedUser) {
-        throw new APIError("User does not exist!");
-      }
-
-      // Step 4
-      const emailSender = EmailSender.getInstance();
-      emailSender.sendSignUpVerificationEmail({
-        toEmail: existedUser.email,
-        emailVerificationToken: newAccountVerification.emailVerificationToken,
-      });
+      return newAccountVerification;
     } catch (error) {
       throw error;
     }

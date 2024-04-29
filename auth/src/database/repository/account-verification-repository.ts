@@ -1,4 +1,3 @@
-import APIError from "../../errors/api-error";
 import AccountVerificationModel from "../models/account-verification.model";
 
 export class AccountVerificationRepository {
@@ -26,6 +25,18 @@ export class AccountVerificationRepository {
     try {
       const existedToken = await AccountVerificationModel.findOne({
         emailVerificationToken: token,
+      });
+
+      return existedToken;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async FindVerificationTokenById({ id }: { id: string }) {
+    try {
+      const existedToken = await AccountVerificationModel.findOne({
+        userId: id,
       });
 
       return existedToken;

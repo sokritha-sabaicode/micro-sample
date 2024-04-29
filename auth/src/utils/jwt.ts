@@ -1,11 +1,13 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import APIError from "../errors/api-error";
-
-const salt = 10;
+import { privateKey } from "../server";
+import getConfig from "./config";
 
 export const generatePassword = async (password: string) => {
   try {
+    const salt = 10;
+
     return await bcrypt.hash(password, salt);
   } catch (error) {
     throw new APIError("Unable to generate password");
@@ -24,10 +26,12 @@ export const validatePassword = async ({
 
 export const generateSignature = async (payload: object): Promise<string> => {
   try {
-    return await jwt.sign(payload, process.env.JWT_TOKEN as string, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
+    return await jwt.sign(payload, privateKey, {
+      expiresIn: parseInt(getConfig().jwtExpiresIn!),
+      algorithm: 'RS256'
     });
   } catch (error) {
+    console.log(error)
     throw new APIError("Unable to generate signature from jwt");
   }
 };

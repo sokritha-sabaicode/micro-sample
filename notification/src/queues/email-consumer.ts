@@ -1,21 +1,20 @@
 import { logger } from '@notifications/utils/logger';
 import { Channel, ConsumeMessage } from 'amqplib';
 import { createQueueConnection } from './connection';
-import { getConfig } from '@notifications/server';
 import { IEmailLocals } from '@notifications/utils/@types/email-sender.type';
 import EmailSender from '@notifications/utils/email-sender';
+import getConfig from '@notifications/utils/config';
 
+// TODO:
+// 1. Check If Channel Exist. If Not Create Once
+// 2. Define ExchangeName, RoutingKey, QueueName
+// 3. Check if Exchange Exist, If Not Create Once
+// 4. Check if Queue Exist, If Not Create Once
+// 5. Bind the Exchange to Queue by Routing Key
+// 6. Consumer: Send Email When there is a message from Queue
 export async function consumeAuthEmailMessages(
   channel: Channel
 ): Promise<void> {
-  // TODO:
-  // 1. Check If Channel Exist. If Not Create Once
-  // 2. Define ExchangeName, RoutingKey, QueueName
-  // 3. Check if Exchange Exist, If Not Create Once
-  // 4. Check if Queue Exist, If Not Create Once
-  // 5. Bind the Exchange to Queue by Routing Key
-  // 6. Consumer: Send Email When there is a message from Queue
-
   try {
     if (!channel) {
       channel = (await createQueueConnection()) as Channel;

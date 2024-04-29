@@ -1,14 +1,11 @@
 import express, {
   Response,
-  json,
-  urlencoded,
   Request,
   NextFunction,
 } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import applyProxy from "./middlewares/proxy";
-import { config } from "./index";
 import { applyRateLimit } from "./middlewares/rate-limit";
 import cookieSession from "cookie-session";
 import hpp from "hpp";
@@ -16,21 +13,29 @@ import compression from "compression";
 import { logger } from "./utils/logger";
 import { StatusCode } from "./utils/consts";
 import { errorHandler } from "./middlewares/error-handler";
-import { RegisterRoutes } from "./routes/routes";
+// import { RegisterRoutes } from "./routes/routes";
+import getConfig from "./utils/createConfig";
+import { verifyUser } from './middlewares/auth-middleware';
+import unless from "./middlewares/unless-route";
 
 const app = express();
+
+const config = getConfig();
 
 // ===================
 // Security Middleware
 // ===================
 app.set("trust proxy", 1);
+app.use(compression())
 app.use(
   cookieSession({
     name: "session",
-    keys: [`${config.secretKeyOne}`, `${config.secretKeyTwo}`],
+    keys: [`${config.cookieSecretKeyOne}`, `${config.cookieSecretKeyTwo}`],
     maxAge: 24 * 7 * 3600000,
     secure: config.env !== "development", // update with value from config
-    // sameSite: none
+    ...(config.env !== 'development' && {
+      sameSite: 'none'
+    })
   })
 );
 
@@ -46,7 +51,7 @@ app.use(helmet());
 // Only Allow Specific Origin to Access API Gateway (Frontend)
 app.use(
   cors({
-    origin: [config.client_url as string],
+    origin: getConfig().env === 'development' ? '*' : [config.clientUrl as string],
     credentials: true, // attach token from client
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -60,21 +65,19 @@ applyRateLimit(app);
 app.disable("x-powered-by");
 
 // ===================
-// Standard Middleware
+// Gateway Health Routes
 // ===================
-app.use(compression());
-app.use(json({ limit: "200mb" }));
-app.use(urlencoded({ limit: "200mb", extended: true }));
+// RegisterRoutes(app);
+
+// ===================
+// JWT Middleware
+// ===================
+app.use(unless('/v1/auth', verifyUser))
 
 // ===================
 // Proxy Routes
 // ===================
 applyProxy(app);
-
-// ===================
-// Gateway Health Routes
-// ===================
-RegisterRoutes(app);
 
 // ====================
 // Global Error Handler

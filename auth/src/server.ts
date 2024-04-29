@@ -1,59 +1,44 @@
-import path from "path";
-import createConfig from "./utils/config";
 import { logInit, logger } from "./utils/logger";
-import EmailSender from "./utils/email-sender";
-import NodemailerEmailApi from "./utils/nodemailer-email-api";
 import MongoDBConnector from "./database";
 import { Channel } from "amqplib";
-
-// ===================== Initialize Config ==========================
-const getConfig = () => {
-  const currentEnv = process.env.NODE_ENV || "development";
-  const configPath =
-    currentEnv === "development"
-      ? path.join(__dirname, `../configs/.env`)
-      : path.join(__dirname, `../configs/.env.${currentEnv}`);
-  return createConfig(configPath);
-};
-export const config = getConfig();
-// ==================================================================
-
-// NOTE: NEED TO IMPORT APP UNDER CONFIG SO THAT COULD ACCESS TO VARIABLE ENV
 import app from "./app";
 import { createQueueConnection } from "./queues/connection";
+import getConfig from "./utils/config";
+import fs from 'fs';
+import path from "path";
 
 export let authChannel: Channel;
 
+export const privateKey = fs.readFileSync(path.join(__dirname, "../private_key.pem"), 'utf-8')
+
 async function run() {
-  try {
+  try { 
+    const config = getConfig(process.env.NODE_ENV);
+
     // Activate Logger
     logInit({ env: process.env.NODE_ENV, logLevel: config.logLevel });
 
-    // Activate Email Sender with EmailAPI [NodeMailer]
-    const emailSender = EmailSender.getInstance();
-    emailSender.activate();
-    emailSender.setEmailApi(new NodemailerEmailApi());
-
     // Activate Database
     const mongodb = MongoDBConnector.getInstance();
-    await mongodb.connect({ url: config.mongo.url as string });
+    await mongodb.connect({ url: config.mongoUrl! });
 
     // Activate RabbitMQ
     authChannel = (await createQueueConnection()) as Channel;
 
     // Start Server
     const server = app.listen(config.port, () => {
-      logger.info("Server is listening on port: ", config.port);
+      logger.info(`Server is listening on port: ${config.port}`);
     });
 
     const exitHandler = async () => {
       if (server) {
         server.close(async () => {
-          logger.info("server closed!");
+          // Close Database
           await mongodb.disconnect();
           logger.info("mongodb disconnected!");
 
           // Gracefully Terminate
+          logger.info("server closed!");
           process.exit(1); // terminate the process due to error
         });
       } else {

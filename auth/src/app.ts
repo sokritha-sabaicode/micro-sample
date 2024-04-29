@@ -8,9 +8,8 @@ import { RegisterRoutes } from "./routes/v1/routes";
 import hpp from "hpp";
 import helmet from "helmet";
 import cors from "cors";
-import { config } from ".";
-import compression from "compression";
-import { urlencoded } from "body-parser";
+import getConfig from "./utils/config";
+// import ipWhitelist from "./middlewares/ip-whitelist";
 
 const app = express();
 
@@ -18,11 +17,12 @@ const app = express();
 // Security Middlewares
 // =======================
 app.set("trust proxy", 1);
+// // app.use(ipWhitelist([]))
 app.use(hpp());
 app.use(helmet());
 app.use(
   cors({
-    origin: config.apiGateway,
+    origin: getConfig().apiGateway,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
@@ -31,9 +31,8 @@ app.use(
 // =======================
 // Standard Middleware
 // =======================
-app.use(compression());
-app.use(express.json({ limit: "200mb" }));
-app.use(urlencoded({ extended: true, limit: "200mb" }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "200mb" }));
 app.use(express.static("public"));
 
 // Logger

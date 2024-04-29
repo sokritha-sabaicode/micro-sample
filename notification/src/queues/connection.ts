@@ -1,7 +1,7 @@
-import { getConfig } from '@notifications/server';
 import { logger } from '@notifications/utils/logger';
 import client, { Channel, Connection } from 'amqplib';
 import { consumeAuthEmailMessages } from './email-consumer';
+import getConfig from '@notifications/utils/config';
 
 export async function createQueueConnection(): Promise<Channel | undefined> {
   try {
@@ -31,19 +31,11 @@ function closeQueueConnection() {
 }
 
 export async function startQueue(): Promise<void> {
-  const emailChannel: Channel = (await createQueueConnection()) as Channel;
-  await consumeAuthEmailMessages(emailChannel);
-  // await consumeSubmissionEmailMessages(emailChannel);
+  try {
+    const emailChannel: Channel = (await createQueueConnection()) as Channel;
+    await consumeAuthEmailMessages(emailChannel);
+  } catch (error) {
+    throw error
+  }
 
-  // await emailChannel.assertExchange('microsample-email-notification', 'direct');
-  // const message = JSON.stringify({
-  //   receiverEmail: `${getConfig().senderEmail}`,
-  //   verifyLink: `${getConfig().clientUrl}/verify?token=1234567890`,
-  //   template: 'verifyEmail',
-  // });
-  // emailChannel.publish(
-  //   'microsample-email-notification',
-  //   'auth-email',
-  //   Buffer.from(message)
-  // );
 }

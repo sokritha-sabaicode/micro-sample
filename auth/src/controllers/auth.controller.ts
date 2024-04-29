@@ -9,14 +9,16 @@ import {
   Get,
 } from "tsoa";
 import validateInput from "../middlewares/validate-input";
-import { IUser } from "../database/models/user.model";
 import { UserSignInSchema, UserSignUpSchema } from "../schema";
 import { StatusCode } from "../utils/consts";
 import { ROUTE_PATHS } from "../routes/v1/route-defs";
 import { generateSignature } from "../utils/jwt";
 import axios from "axios";
 import { publishDirectMessage } from "../queues/auth.producer";
-import { authChannel } from "..";
+import { authChannel } from "../server";
+import { logger } from "../utils/logger";
+import APIError from "../errors/api-error";
+import { IAuthUserMessageDetails } from "../queues/@types/auth.type";
 
 interface SignUpRequestBody {
   username: string;
@@ -31,6 +33,10 @@ interface LoginRequestBody {
 
 @Route("v1/auth")
 export class AuthController {
+  // TODO:
+  // 1. Save User
+  // 2. Generate Verification Token & Save to its DB
+  // 2. Publish User Detail to Notification Service
   @SuccessResponse(StatusCode.Created, "Created")
   @Post(ROUTE_PATHS.AUTH.SIGN_UP)
   @Middlewares(validateInput(UserSignUpSchema))
@@ -38,37 +44,32 @@ export class AuthController {
     @Body() requestBody: SignUpRequestBody
   ): Promise<any> {
     try {
-      // TODO:
-      // 1. Save User
-      // 2. Send User Detail to Notification Service
-      // 3. Send User Detail to User Service
-
       const { username, email, password } = requestBody;
 
-      // Save User
+      // Step 1.
       const userService = new UserService();
       const newUser = await userService.Create({ username, email, password });
 
-      // [Old Version] - Send Email Verification
-      await userService.SendVerifyEmailToken({ userId: newUser._id });
+      // Step 2.
+      const verificationToken = await userService.SaveVerificationToken({ userId: newUser._id })
 
       const messageDetails = {
         receiverEmail: newUser.email,
-        // verifyLink
+        verifyLink: `${verificationToken.emailVerificationToken}`,
         template: "verifyEmail",
       };
 
-      // [New Version] - Publish To Notification Service / User Service
+      // Publish To Notification Service
       await publishDirectMessage(
         authChannel,
-        "email-notification",
+        "microsample-email-notification",
         "auth-email",
         JSON.stringify(messageDetails),
         "Verify email message has been sent to notification service"
       );
 
       return {
-        message: "User create successfully. Please verify your email.",
+        message: "Sign up successfully. Please verify your email.",
         data: newUser,
       };
     } catch (error) {
@@ -76,21 +77,47 @@ export class AuthController {
     }
   }
 
+  // TODO:
+  // 1. Verify Token
+  // 2. Generate JWT
+  // 3. Publish User Detail to User Service
   @SuccessResponse(StatusCode.OK, "OK")
   @Get(ROUTE_PATHS.AUTH.VERIFY)
-  public async VerifyEmail(@Query() token: string): Promise<{ token: string }> {
+  public async VerifyEmail(@Query() token: string): Promise<{ message: string, token: string }> {
     try {
       const userService = new UserService();
 
-      // Verify the email token
+      // Step 1.
       const user = await userService.VerifyEmailToken({ token });
 
-      // Generate JWT for the verified user
+      // Step 2.
       const jwtToken = await generateSignature({
         userId: user._id,
       });
 
-      return { token: jwtToken };
+      // Step 3.
+      const userDetail = await userService.FindUserByEmail({ email: user.email })
+
+      if (!userDetail) {
+        logger.error(`AuthController VerifyEmail() method error: user not found`)
+        throw new APIError(`Something went wrong`, StatusCode.InternalServerError)
+      }
+
+      const messageDetails: IAuthUserMessageDetails = {
+        username: userDetail.username,
+        email: userDetail.email,
+        type: 'auth'
+      }
+
+      await publishDirectMessage(
+        authChannel,
+        'microsample-user-update',
+        'user-applier',
+        JSON.stringify(messageDetails),
+        'User details sent to user service'
+      )
+
+      return { message: 'User verify email successfully', token: jwtToken };
     } catch (error) {
       throw error;
     }

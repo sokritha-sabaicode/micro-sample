@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import APIError from '../errors/api-error';
+import path from 'path';
 
 function createConfig(configPath: string) {
   dotenv.config({ path: configPath });
@@ -13,6 +14,8 @@ function createConfig(configPath: string) {
     'RABBITMQ_ENDPOINT',
     'SENDER_EMAIL',
     'SENDER_EMAIL_PASSWORD',
+    'SMTP_HOST',
+    'SMTP_PORT'
   ];
   const missingConfig = requiredConfig.filter((key) => !process.env[key]);
 
@@ -31,7 +34,17 @@ function createConfig(configPath: string) {
     rabbitMQ: process.env.RABBITMQ_ENDPOINT,
     senderEmail: process.env.SENDER_EMAIL,
     senderEmailPassword: process.env.SENDER_EMAIL_PASSWORD,
+    smtpHost: process.env.SMTP_HOST,
+    smtpPort: process.env.SMTP_PORT
   };
 }
 
-export default createConfig;
+const getConfig = (currentEnv: string = 'development') => {
+  const configPath =
+    currentEnv === "development"
+      ? path.join(__dirname, `../../configs/.env`)
+      : path.join(__dirname, `../../configs/.env.${currentEnv}`);
+  return createConfig(configPath);
+};
+
+export default getConfig;

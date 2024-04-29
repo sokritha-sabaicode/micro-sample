@@ -7,28 +7,6 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"IUser": {
-				"properties": {
-					"username": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"phone": {
-						"type": "string"
-					},
-					"isVerified": {
-						"type": "boolean"
-					}
-				},
-				"required": [
-					"username",
-					"email"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"SignUpRequestBody": {
 				"properties": {
 					"username": {
@@ -69,7 +47,7 @@
 		"securitySchemes": {}
 	},
 	"info": {
-		"title": "auth",
+		"title": "auth-service",
 		"version": "1.0.0",
 		"description": "Authentication microservice for our micro sample app",
 		"license": {
@@ -82,15 +60,13 @@
 	"paths": {
 		"/v1/auth/signup": {
 			"post": {
-				"operationId": "SignUp",
+				"operationId": "SignUpWithEmail",
 				"responses": {
 					"201": {
 						"description": "Created",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/IUser"
-								}
+								"schema": {}
 							}
 						}
 					}
@@ -121,10 +97,14 @@
 									"properties": {
 										"token": {
 											"type": "string"
+										},
+										"message": {
+											"type": "string"
 										}
 									},
 									"required": [
-										"token"
+										"token",
+										"message"
 									],
 									"type": "object"
 								}

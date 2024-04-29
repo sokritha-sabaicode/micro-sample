@@ -35,3 +35,9 @@ Test Driven Development (TDD)
 - Begin -> Write Test -> Test will Fail -> Write code that the test passes -> Test passes (lifecycle)
 - Three laws of TDD:
   - You are not allowed to write any production code unless it is to make a failing unit test pass
+
+
+How to Generate RSA Private Key
+- openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+Extract the Public Key From Private Key
+- openssl rsa -pubout -in private_key.pem -out public_key.pem

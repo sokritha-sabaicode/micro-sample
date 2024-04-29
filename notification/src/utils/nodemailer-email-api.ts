@@ -3,9 +3,9 @@ import { EmailApi, IEmailLocals } from './@types/email-sender.type';
 import nodemailer from 'nodemailer';
 import NodemailerSmtpServer from './nodemailer-smtp-server';
 import Email from 'email-templates';
-import { getConfig } from '@notifications/server';
 import path from 'path';
 import { logger } from './logger';
+import getConfig from '@notifications/utils/config';
 
 export default class NodemailerEmailApi implements EmailApi {
   private transporter: Mail;

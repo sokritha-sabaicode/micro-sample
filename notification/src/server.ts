@@ -1,32 +1,9 @@
-import path from 'path';
-import createConfig from './utils/config';
 import { logInit, logger } from './utils/logger';
-
-// ===================== Initialize Config ==========================
-const initializeConfig = () => {
-  const currentEnv = process.env.NODE_ENV || 'development';
-  const configPath =
-    currentEnv === 'development'
-      ? path.join(__dirname, `../configs/.env`)
-      : path.join(__dirname, `../configs/.env.${currentEnv}`);
-  return createConfig(configPath);
-};
-
-export function getConfig() {
-  try {
-    return initializeConfig();
-  } catch (error) {
-    logger.info(`Failed to getConfig() method in Notification Server`);
-    throw error;
-  }
-}
-// ==================================================================
-
-// NOTE: NEED TO IMPORT APP UNDER CONFIG SO THAT COULD ACCESS TO VARIABLE ENV
 import app from './app';
 import { startQueue } from './queues/connection';
 import EmailSender from '@notifications/utils/email-sender';
 import NodemailerEmailApi from '@notifications/utils/nodemailer-email-api';
+import getConfig from '@notifications/utils/config';
 
 async function run() {
   try {

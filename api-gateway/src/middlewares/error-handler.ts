@@ -5,12 +5,12 @@ import { logger } from "../utils/logger";
 
 const errorHandler = (
   err: Error,
-  req: Request,
+  _req: Request,
   res: Response,
   _next: NextFunction
 ): Response => {
   logger.error(`Gateway Service`, err);
-  
+
   // If the error is an instance of our own throw ERROR
   if (err instanceof BaseCustomError) {
     return res.status(err.getStatusCode()).json(err.serializeErrorOutput());

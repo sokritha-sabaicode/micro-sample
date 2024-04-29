@@ -1,11 +1,11 @@
 {
-  "name": "auth",
+  "name": "auth-service",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "src/server.ts",
   "license": "MIT",
   "description": "Authentication microservice for our micro sample app",
   "scripts": {
-    "start:dev": "cross-env NODE_ENV=development nodemon src/index.ts",
+    "start:dev": "cross-env NODE_ENV=development nodemon src/server.ts",
     "gen:spec": "tsoa spec",
     "gen:routes": "tsoa routes",
     "gen:all": "npm run gen:spec && npm run gen:routes",
@@ -24,8 +24,6 @@
     "amqplib": "^0.10.4",
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
-    "body-parser": "^1.20.2",
-    "compression": "^1.7.4",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -48,7 +46,6 @@
   "devDependencies": {
     "@types/amqplib": "^0.10.5",
     "@types/bcrypt": "^5.0.2",
-    "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.21",

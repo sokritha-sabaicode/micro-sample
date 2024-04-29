@@ -1,7 +1,7 @@
 {
   "name": "notification-service",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "license": "MIT",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon -r tsconfig-paths/register src/server.ts",

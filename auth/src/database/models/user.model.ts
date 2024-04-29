@@ -16,7 +16,7 @@ export interface IUserDocument extends Document {
   googleId?: string;
 }
 
-export interface IUserModel extends Model<IUserDocument> {}
+export interface IUserModel extends Model<IUserDocument> { }
 
 const userSchema = new mongoose.Schema(
   {
@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     toJSON: {
-      transform(doc, ret) {
+      transform(_doc, ret) {
         delete ret.password;
         delete ret.googleId;
         delete ret.__v;

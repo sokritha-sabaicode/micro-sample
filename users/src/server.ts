@@ -1,43 +1,38 @@
-import path = require("path");
-import createConfig from "./utils/createConfig";
 import { logInit, logger } from "./utils/logger";
-
-// ===================== Initialize Config ==========================
-const getConfig = () => {
-  const currentEnv = process.env.NODE_ENV || "development";
-  const configPath =
-    currentEnv === "development"
-      ? path.join(__dirname, `../configs/.env`)
-      : path.join(__dirname, `../configs/.env.${currentEnv}`);
-  return createConfig(configPath);
-};
-export const config = getConfig();
-// ==================================================================
-
+import MongoDBConnector from "./database";
+import getConfig from "@users/utils/config";
 import app from "./app";
 
 async function run() {
   try {
+    // Get Config
+    const config = getConfig(process.env.NODE_ENV);
+
     // Activate Logger
     logInit({ env: process.env.NODE_ENV, logLevel: config.logLevel });
 
-    // Start Server
-    logger.info(`Gateway server has started with process id ${process.pid}`);
+    // Activate Database
+    const mongodb = MongoDBConnector.getInstance();
+    await mongodb.connect({ url: config.mongoUrl as string });
 
+    // Start Server
     const server = app.listen(config.port, () => {
-      logger.info(`Gateway server is listening on port: ${config.port}`);
+      logger.info(`Server is listening on port: ${config.port}`);
     });
 
     const exitHandler = async () => {
       if (server) {
         server.close(async () => {
           logger.info("server closed!");
+          await mongodb.disconnect();
           logger.info("mongodb disconnected!");
 
           // Gracefully Terminate
           process.exit(1); // terminate the process due to error
         });
       } else {
+        await mongodb.disconnect(); // In case the server isn't running but DB needs to be disconnected
+        logger.info("MongoDB disconnected.");
         process.exit(1);
       }
     };
@@ -60,7 +55,7 @@ async function run() {
       }
     });
   } catch (error) {
-    logger.error("Gateway Service Failed", { error });
+    logger.error("Failed to initialize application", { error });
     process.exit(1);
   }
 }

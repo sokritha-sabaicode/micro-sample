@@ -11,17 +11,6 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "IUser": {
-        "dataType": "refObject",
-        "properties": {
-            "username": {"dataType":"string","required":true},
-            "email": {"dataType":"string","required":true},
-            "phone": {"dataType":"string"},
-            "isVerified": {"dataType":"boolean"},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SignUpRequestBody": {
         "dataType": "refObject",
         "properties": {
@@ -53,9 +42,9 @@ export function RegisterRoutes(app: Router) {
     // ###########################################################################################################
         app.post('/v1/auth/signup',
             ...(fetchMiddlewares<RequestHandler>(AuthController)),
-            ...(fetchMiddlewares<RequestHandler>(AuthController.prototype.SignUp)),
+            ...(fetchMiddlewares<RequestHandler>(AuthController.prototype.SignUpWithEmail)),
 
-            function AuthController_SignUp(request: ExRequest, response: ExResponse, next: any) {
+            function AuthController_SignUpWithEmail(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignUpRequestBody"},
             };
@@ -69,7 +58,7 @@ export function RegisterRoutes(app: Router) {
                 const controller = new AuthController();
 
               templateService.apiHandler({
-                methodName: 'SignUp',
+                methodName: 'SignUpWithEmail',
                 controller,
                 response,
                 next,
