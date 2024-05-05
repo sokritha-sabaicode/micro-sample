@@ -31,7 +31,7 @@ app.use(
   cookieSession({
     name: "session",
     keys: [`${config.cookieSecretKeyOne}`, `${config.cookieSecretKeyTwo}`],
-    maxAge: 24 * 7 * 3600000,
+    maxAge: 3600000, // 1d algin with JWT
     secure: config.env !== "development", // update with value from config
     ...(config.env !== 'development' && {
       sameSite: 'none'

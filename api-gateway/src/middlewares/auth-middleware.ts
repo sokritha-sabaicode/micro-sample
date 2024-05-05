@@ -11,7 +11,10 @@ async function verifyUser(
   _next: NextFunction
 ) {
   try {
+    console.log(req.session)
+
     if (!req.session?.jwt) {
+      console.log('hi')
       logger.error(
         "Token is not available. Gateway Service verifyUser() method error"
       );
@@ -20,6 +23,7 @@ async function verifyUser(
         StatusCode.Unauthorized
       );
     }
+
 
     await verify(req.session!.jwt, publicKey, { algorithms: ["RS256"] });
     _next();

@@ -11,21 +11,19 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "SignUpRequestBody": {
+    "IAuthDocument": {
         "dataType": "refObject",
         "properties": {
-            "username": {"dataType":"string","required":true},
-            "email": {"dataType":"string","required":true},
-            "password": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "LoginRequestBody": {
-        "dataType": "refObject",
-        "properties": {
-            "email": {"dataType":"string","required":true},
-            "password": {"dataType":"string","required":true},
+            "_id": {"dataType":"string"},
+            "username": {"dataType":"string"},
+            "email": {"dataType":"string"},
+            "password": {"dataType":"string"},
+            "phoneNumber": {"dataType":"string"},
+            "role": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["COMPANY"]},{"dataType":"enum","enums":["USER"]}]},
+            "isVerified": {"dataType":"boolean"},
+            "googleId": {"dataType":"string"},
+            "createdAt": {"dataType":"union","subSchemas":[{"dataType":"datetime"},{"dataType":"string"}]},
+            "updatedAt": {"dataType":"union","subSchemas":[{"dataType":"datetime"},{"dataType":"string"}]},
         },
         "additionalProperties": false,
     },
@@ -46,7 +44,7 @@ export function RegisterRoutes(app: Router) {
 
             function AuthController_SignUpWithEmail(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SignUpRequestBody"},
+                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"IAuthDocument"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -106,7 +104,7 @@ export function RegisterRoutes(app: Router) {
 
             function AuthController_LoginWithEmail(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"LoginRequestBody"},
+                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"IAuthDocument"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

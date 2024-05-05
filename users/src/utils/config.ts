@@ -29,7 +29,8 @@ function createConfig(configPath: string) {
     apiGatewayUrl: process.env.API_GATEWAY_URL,
     logLevel: process.env.LOG_LEVEL,
     rabbitMQ: process.env.RABBITMQ_ENDPOINT,
-    mongoUrl: process.env.MONGODB_URL
+    mongoUrl: process.env.MONGODB_URL,
+    authServiceUrl: process.env.AUTH_SERVICE_URL
   };
 }
 

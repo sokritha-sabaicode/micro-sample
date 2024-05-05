@@ -3,20 +3,26 @@ import UserModel from "@users/database/models/user.model";
 import APIError from "@users/errors/api-error";
 import DuplicateError from "@users/errors/duplicate-error";
 import { StatusCode } from "@users/utils/consts";
+import { logger } from "@users/utils/logger";
 
 class UserRepository {
-  async createUser(userDetail: IUserDocument) {
+  // TODO:
+  // 1. Check for existing user with the same email
+  // 2. Save User
+  async CreateUser(userDetail: IUserDocument & { authId: string }) {
     try {
-      // Check for existing user with the same email
+      // Step 1.
       const existingUser = await this.FindUserByEmail({ email: userDetail.email! })
       if (existingUser) {
         throw new DuplicateError('Email already in use');
       }
 
+      // Step 2.
       const user = new UserModel(userDetail);
       const userResult = await user.save();
       return userResult;
     } catch (error) {
+      logger.error(`UserService UserRepository CreateUser() method error: ${error}`)
       if (error instanceof DuplicateError) {
         throw error;
       }
@@ -68,6 +74,7 @@ class UserRepository {
 
       return newUpdateUser;
     } catch (error) {
+      logger.error(`UserService UserRepository UpdateUserById() method error: ${error}`)
       if (error instanceof APIError) {
         throw error;
       }

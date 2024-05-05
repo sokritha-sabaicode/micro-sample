@@ -6,7 +6,7 @@ function createConfig(configPath: string) {
   dotenv.config({ path: configPath });
 
   // Validate essential configuration
-  const requiredConfig = ["NODE_ENV", "PORT", "MONGODB_URL", "LOG_LEVEL", "RABBITMQ_ENDPOINT", "CLIENT_URL", "JWT_EXPIRES_IN"];
+  const requiredConfig = ["NODE_ENV", "PORT", "MONGODB_URL", "LOG_LEVEL", "RABBITMQ_ENDPOINT", "CLIENT_URL", "JWT_EXPIRES_IN", "USER_SERVICE", "COMPANY_SERVICE"];
   const missingConfig = requiredConfig.filter((key) => !process.env[key]);
 
   if (missingConfig.length > 0) {
@@ -24,7 +24,9 @@ function createConfig(configPath: string) {
     rabbitMQ: process.env.RABBITMQ_ENDPOINT,
     clientUrl: process.env.CLIENT_URL,
     apiGateway: process.env.API_GATEWAY,
-    jwtExpiresIn: process.env.JWT_EXPIRES_IN
+    jwtExpiresIn: process.env.JWT_EXPIRES_IN,
+    userServiceUrl: process.env.USER_SERVICE,
+    companyServiceUrl: process.env.COMPANY_SERVICE
   };
 }
 

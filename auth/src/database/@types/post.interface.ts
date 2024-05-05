@@ -1,4 +1,4 @@
-import { ICompanyDocument } from "@users/database/@types/company.interface";
+import { ICompanyDocument } from "./company.interface";
 
 export interface IPostDocument {
   _id?: string,

@@ -2,6 +2,11 @@ import { logInit, logger } from "./utils/logger";
 import MongoDBConnector from "./database";
 import getConfig from "@users/utils/config";
 import app from "./app";
+import path from 'path';
+import fs from 'fs';
+
+// READ FILE JWT PUBLIC KEY FIRST
+export const publicKey = fs.readFileSync(path.join(__dirname, "../public_key.pem"), 'utf-8')
 
 async function run() {
   try {
@@ -9,7 +14,7 @@ async function run() {
     const config = getConfig(process.env.NODE_ENV);
 
     // Activate Logger
-    logInit({ env: process.env.NODE_ENV, logLevel: config.logLevel });
+    logInit({ env: config.env, logLevel: config.logLevel });
 
     // Activate Database
     const mongodb = MongoDBConnector.getInstance();

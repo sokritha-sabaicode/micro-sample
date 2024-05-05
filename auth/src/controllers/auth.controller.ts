@@ -18,17 +18,16 @@ import { publishDirectMessage } from "../queues/auth.producer";
 import { authChannel } from "../server";
 import { logger } from "../utils/logger";
 import APIError from "../errors/api-error";
-import { IAuthUserMessageDetails } from "../queues/@types/auth.type";
+import { IAuthDocument } from "../database/@types/auth.interface";
+import getConfig from "../utils/config";
+import { IUserDocument } from '../database/@types/user.interface';
+import { ICompanyDocument } from "../database/@types/company.interface";
 
-interface SignUpRequestBody {
-  username: string;
-  email: string;
-  password: string;
-}
-
-interface LoginRequestBody {
-  email: string;
-  password: string;
+interface AxiosUserPostRequestResponse {
+  data: {
+    message: string;
+    data: IUserDocument | ICompanyDocument
+  }
 }
 
 @Route("v1/auth")
@@ -41,14 +40,14 @@ export class AuthController {
   @Post(ROUTE_PATHS.AUTH.SIGN_UP)
   @Middlewares(validateInput(UserSignUpSchema))
   public async SignUpWithEmail(
-    @Body() requestBody: SignUpRequestBody
+    @Body() requestBody: IAuthDocument
   ): Promise<any> {
     try {
-      const { username, email, password } = requestBody;
+      const { username, email, password, role } = requestBody;
 
       // Step 1.
       const userService = new UserService();
-      const newUser = await userService.Create({ username, email, password });
+      const newUser = await userService.Create({ username: username as string, email: email as string, password, role: role });
 
       // Step 2.
       const verificationToken = await userService.SaveVerificationToken({ userId: newUser._id })
@@ -79,8 +78,8 @@ export class AuthController {
 
   // TODO:
   // 1. Verify Token
-  // 2. Generate JWT
-  // 3. Publish User Detail to User Service
+  // 2. Check Role of User, Publish User Detail to User Service / Company Service
+  // 3. Generate JWT
   @SuccessResponse(StatusCode.OK, "OK")
   @Get(ROUTE_PATHS.AUTH.VERIFY)
   public async VerifyEmail(@Query() token: string): Promise<{ message: string, token: string }> {
@@ -91,34 +90,38 @@ export class AuthController {
       const user = await userService.VerifyEmailToken({ token });
 
       // Step 2.
-      const jwtToken = await generateSignature({
-        userId: user._id,
-      });
-
-      // Step 3.
-      const userDetail = await userService.FindUserByEmail({ email: user.email })
+      const userDetail = await userService.FindUserByEmail({ email: user.email! })
 
       if (!userDetail) {
         logger.error(`AuthController VerifyEmail() method error: user not found`)
         throw new APIError(`Something went wrong`, StatusCode.InternalServerError)
       }
 
-      const messageDetails: IAuthUserMessageDetails = {
+      let response: AxiosUserPostRequestResponse;
+      let data: IUserDocument & { authId: string } = {
+        authId: userDetail._id,
         username: userDetail.username,
         email: userDetail.email,
-        type: 'auth'
+        phoneNumber: userDetail.phoneNumber,
+        createdAt: userDetail.createdAt
+      };
+
+      if (userDetail.role === 'USER') {
+        response = await axios.post(`${getConfig().userServiceUrl}/v1/users`, data)
+      } else { // ROLE: COMPANY
+        response = await axios.post(`${getConfig().userServiceUrl}/v1/users`, data)
       }
 
-      await publishDirectMessage(
-        authChannel,
-        'microsample-user-update',
-        'user-applier',
-        JSON.stringify(messageDetails),
-        'User details sent to user service'
-      )
+      // Step 3.
+      const jwtToken = await generateSignature({
+        userId: response.data.data._id,
+        role: userDetail.role
+      });
+
 
       return { message: 'User verify email successfully', token: jwtToken };
     } catch (error) {
+      logger.error(`AuthService VerifyEmail() method error: ${error}`)
       throw error;
     }
   }
@@ -127,13 +130,13 @@ export class AuthController {
   @Post(ROUTE_PATHS.AUTH.LOGIN)
   @Middlewares(validateInput(UserSignInSchema))
   public async LoginWithEmail(
-    @Body() requestBody: LoginRequestBody
+    @Body() requestBody: IAuthDocument
   ): Promise<{ token: string }> {
     try {
       const { email, password } = requestBody;
 
       const userService = new UserService();
-      const jwtToken = await userService.Login({ email, password });
+      const jwtToken = await userService.Login({ email: email as string, password: password as string });
 
       return {
         token: jwtToken,

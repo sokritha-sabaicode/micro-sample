@@ -1,3 +1,4 @@
+import { IAuthDocument } from "../database/@types/auth.interface";
 import AccountVerificationModel from "../database/models/account-verification.model";
 import { AccountVerificationRepository } from "../database/repository/account-verification-repository";
 import UserRepository from "../database/repository/user-repository";
@@ -16,7 +17,6 @@ import {
   validatePassword,
 } from "../utils/jwt";
 import { logger } from "../utils/logger";
-import { UserSignUpParams, UserSignUpResult } from "./@types/user-service.type";
 
 class UserService {
   private userRepo: UserRepository;
@@ -34,7 +34,7 @@ class UserService {
   // 3. If Error, Check Duplication
   // 3.1. Duplication case 1: Sign Up Without Verification
   // 3.2. Duplication case 2: Sign Up With The Same Email
-  async Create(userDetails: UserSignUpParams): Promise<UserSignUpResult> {
+  async Create(userDetails: IAuthDocument) {
     try {
       // Step 1
       const hashedPassword =
@@ -47,19 +47,25 @@ class UserService {
       }
 
       // Step 2
-      const newUser = await this.userRepo.CreateUser(newUserParams);
+      const newUser = await this.userRepo.CreateUser({
+        username: userDetails.username!,
+        email: userDetails.email!,
+        password: userDetails.password!,
+        role: userDetails.role!,
+        
+      });
 
       return newUser;
     } catch (error: unknown) {
       // Step 3
       if (error instanceof DuplicateError) {
         const existedUser = await this.userRepo.FindUser({
-          email: userDetails.email,
+          email: userDetails.email!,
         });
 
         if (!existedUser?.isVerified) {
           // Resent the token
-          const token = await this.accountVerificationRepo.FindVerificationTokenById({ id: existedUser!._id });
+          const token = await this.accountVerificationRepo.FindVerificationTokenById({ id: existedUser!._id.toString() });
 
           if (!token) {
             logger.error(`UserService Create() method error: token not found!`)
@@ -71,7 +77,7 @@ class UserService {
             verifyLink: `${token.emailVerificationToken}`,
             template: "verifyEmail",
           };
-    
+
           // Publish To Notification Service
           await publishDirectMessage(
             authChannel,
@@ -118,7 +124,12 @@ class UserService {
     }
   }
 
+  // TODO
+  // 1. Check If Token Query Exist in Collection
+  // 2. Find the User Associated With This Token, Ten Update isVerified to True
+  // 3. Remove Token from Collection
   async VerifyEmailToken({ token }: { token: string }) {
+    // Step 1.
     const isTokenExist =
       await this.accountVerificationRepo.FindVerificationToken({ token });
 
@@ -129,7 +140,7 @@ class UserService {
       );
     }
 
-    // Find the user associated with this token
+    // Step 2.
     const user = await this.userRepo.FindUserById({
       id: isTokenExist.userId.toString(),
     });
@@ -137,11 +148,10 @@ class UserService {
       throw new APIError("User does not exist.", StatusCode.NotFound);
     }
 
-    // Mark the user's email as verified
     user.isVerified = true;
     await user.save();
 
-    // Remove the verification token
+    // Step 3.
     await this.accountVerificationRepo.DeleteVerificationToken({ token });
 
     return user;

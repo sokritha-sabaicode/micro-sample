@@ -1,17 +1,14 @@
 import APIError from "../../errors/api-error";
 import DuplicateError from "../../errors/duplicate-error";
 import UserModel from "../models/user.model";
-import {
-  UserCreateRepository,
-  UserUpdateRepository,
-} from "./@types/user-repository.type";
 import { StatusCode } from "../../utils/consts";
+import { IAuthDocument } from "../@types/auth.interface";
 
 class UserRepository {
-  async CreateUser(userDetail: UserCreateRepository) {
+  async CreateUser(userDetail: IAuthDocument) {
     try {
       // Check for existing user with the same email
-      const existingUser = await this.FindUser({ email: userDetail.email });
+      const existingUser = await this.FindUser({ email: userDetail.email! });
       if (existingUser) {
         throw new DuplicateError("Email already in use");
       }
@@ -53,7 +50,7 @@ class UserRepository {
     updates,
   }: {
     id: string;
-    updates: UserUpdateRepository;
+    updates: IAuthDocument;
   }) {
     try {
       const isExist = await this.FindUserById({ id });

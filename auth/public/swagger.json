@@ -7,8 +7,11 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"SignUpRequestBody": {
+			"IAuthDocument": {
 				"properties": {
+					"_id": {
+						"type": "string"
+					},
 					"username": {
 						"type": "string"
 					},
@@ -17,29 +20,46 @@
 					},
 					"password": {
 						"type": "string"
-					}
-				},
-				"required": [
-					"username",
-					"email",
-					"password"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"LoginRequestBody": {
-				"properties": {
-					"email": {
+					},
+					"phoneNumber": {
 						"type": "string"
 					},
-					"password": {
+					"role": {
+						"type": "string",
+						"enum": [
+							"COMPANY",
+							"USER"
+						]
+					},
+					"isVerified": {
+						"type": "boolean"
+					},
+					"googleId": {
 						"type": "string"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"updatedAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
 					}
 				},
-				"required": [
-					"email",
-					"password"
-				],
 				"type": "object",
 				"additionalProperties": false
 			}
@@ -78,7 +98,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SignUpRequestBody"
+								"$ref": "#/components/schemas/IAuthDocument"
 							}
 						}
 					}
@@ -155,7 +175,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/LoginRequestBody"
+								"$ref": "#/components/schemas/IAuthDocument"
 							}
 						}
 					}

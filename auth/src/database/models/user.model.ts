@@ -1,29 +1,26 @@
 import mongoose, { Document, Model } from "mongoose";
 
-export interface IUser {
-  username: string;
-  email: string;
-  phone?: string;
-  isVerified?: boolean;
-}
-
-export interface IUserDocument extends Document {
+interface IUserDocument extends Document {
   username: string;
   email: string;
   password?: string;
-  phone?: string;
+  phoneNumber?: string;
+  role?: 'USER' | 'COMPANY',
   isVerified?: boolean;
   googleId?: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date
 }
 
-export interface IUserModel extends Model<IUserDocument> { }
+interface IUserModel extends Model<IUserDocument> { }
 
 const userSchema = new mongoose.Schema(
   {
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String },
-    phone: { type: String },
+    phoneNumber: { type: String },
+    role: { type: String, enum: ["USER", "COMPANY"] },
     isVerified: {
       type: Boolean,
       default: false,
@@ -35,6 +32,7 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
+    timestamps: true,
     toJSON: {
       transform(_doc, ret) {
         delete ret.password;

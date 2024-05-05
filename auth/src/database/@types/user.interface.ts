@@ -1,4 +1,4 @@
-import { IPostDocument } from "@users/database/@types/post.interface";
+import { IPostDocument } from "./post.interface";
 
 export interface IUserDocument {
   _id?: string,

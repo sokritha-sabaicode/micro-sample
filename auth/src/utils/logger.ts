@@ -1,13 +1,17 @@
 import winston from "winston";
 import path from "path";
 
+const { combine, timestamp, printf, colorize, align } = winston.format;
+
 // Create a Winston Logger
 export const logger = winston.createLogger({
   defaultMeta: { service: "auth-service" },
   // Add a timestamp to each log message & format in JSON
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
+  format: combine(
+    colorize({ all: true }),
+    timestamp(),
+    align(),
+    printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
   ),
   transports: [],
 });
