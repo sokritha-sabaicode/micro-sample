@@ -16,7 +16,6 @@
       "noUnusedParameters": true,
       "alwaysStrict": true,
       "pretty": true,
-
     },
   }
   

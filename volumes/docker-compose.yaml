@@ -12,50 +12,58 @@ services:
       - "5672:5672"
       # Management UI
       - "15672:15672"
-  # gateway:
-  #   container_name: gateway_container
-  #   build:
-  #     context: ../api-gateway
-  #     dockerfile: Dockerfile.dev
-  #   restart: always
-  #   ports:
-  #     - 3000:3000
-  #   env_file: ../api-gateway/configs/.env
-  #   environment:
-  #     # OUTSOURCE SERVICE
-  #     - AUTH_SERVICE_URLAUTH_SERVICE_URL=http://localhost:3001
-  #     - CLIENT_URL=http://localhost:8000
-  #     # GATEWAY SERVICE
-  #     - NODE_ENV=development
-  #     - PORT=3000
-  #     # TOKEN (GENERATE BY YOUR OWN)
-  #     - GATEWAY_JWT_TOKEN=8869b23eddb18fd53992e47bfe8fada5
-  #     - JWT_TOKEN=bba49f8c489c0b81ee2b6b7a6a6128e6
-  #     - SECRET_KEY_ONE=1d043cdc92e73a6fc6ef35601574be9a
-  #     - SECRET_KEY_TWO=90a071f0dc2624e311fec81321f2f94e
-  #     # LOG SERVICE
-  #     - LOG_LEVEL=debug
-  #     # REDIS SERVICE
-  #     - REDIS_HOST=redis://redis_container:6379
-  # notification:
-  #   container_name: notification_container
-  #   build:
-  #     context: ../notification
-  #     dockerfile: Dockerfile.dev
-  #   restart: always
-  #   ports:
-  #     - 3009:3009
-  #   env_file: ../notification/configs/.env
-  #   environment:
-  #     - ENABLE_APM=0
-  #     - LOG_LEVEL=debug
-  #     - NODE_ENV=development
-  #     - PORT=3009
-  #     - CLIENT_URL=http://localhost:8000
-  #     - RABBITMQ_ENDPOINT=amqp://myuser:mypassword@rabbitmq_container:5672
-  #     - SMTP_HOST=smtp.gmail.com
-  #     - SMTP_PORT=587
-  #     - SENDER_EMAIL=sokritha.dev@gmail.com
-  #     - SENDER_EMAIL_PASSWORD=tcfvmngksishuhku
-  #   depends_on:
-  #     - rabbitmq
+  gateway:
+    container_name: gateway_container
+    build:
+      context: ../api-gateway
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - 3000:3000
+    env_file: ../api-gateway/configs/.env
+    environment:
+      - DOCKER_ENV=true
+      - AUTH_SERVICE_URL=http://auth:3001
+      - USER_SERVICE_URL=http://user-profile:3002
+    secrets:
+      - jwt_public_key
+  auth:
+    container_name: auth_container
+    build:
+      context: ../auth
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - 3001:3001
+    env_file: ../auth/configs/.env
+    environment:
+      - DOCKER_ENV=true
+    secrets:
+      - jwt_private_key
+    depends_on:
+      - rabbitmq
+  user-profile:
+    container_name: user_profile_container
+    build:
+      context: ../users
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - 3002:3002
+    env_file: ../users/configs/.env
+  notification:
+    container_name: notification_container
+    build:
+      context: ../notification
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - 3009:3009
+    env_file: ../notification/configs/.env
+    depends_on:
+      - rabbitmq
+secrets:
+  jwt_public_key:
+    file: ../api-gateway/public_key.pem
+  jwt_private_key:
+    file: ../auth/private_key.pem

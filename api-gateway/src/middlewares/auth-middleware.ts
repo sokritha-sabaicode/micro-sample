@@ -11,10 +11,8 @@ async function verifyUser(
   _next: NextFunction
 ) {
   try {
-    console.log(req.session)
-
+    console.log(req.path)
     if (!req.session?.jwt) {
-      console.log('hi')
       logger.error(
         "Token is not available. Gateway Service verifyUser() method error"
       );

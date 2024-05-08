@@ -9,10 +9,15 @@ import path from "path";
 
 export let authChannel: Channel;
 
-export const privateKey = fs.readFileSync(path.join(__dirname, "../private_key.pem"), 'utf-8')
+// Check if the environment variable is set for Docker deployment
+const privateKeyPath = process.env.DOCKER_ENV
+  ? '/run/secrets/jwt_private_key'  // Path in Docker
+  : path.join(__dirname, '../private_key.pem');  // Path in local development
+
+export const privateKey = fs.readFileSync(privateKeyPath, 'utf-8');
 
 async function run() {
-  try { 
+  try {
     const config = getConfig(process.env.NODE_ENV);
 
     // Activate Logger

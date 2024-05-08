@@ -52,7 +52,7 @@ class UserService {
         email: userDetails.email!,
         password: userDetails.password!,
         role: userDetails.role!,
-        
+        isVerified: userDetails.isVerified
       });
 
       return newUser;

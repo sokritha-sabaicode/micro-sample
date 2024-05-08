@@ -7,6 +7,7 @@ import {
   SuccessResponse,
   Query,
   Get,
+  Queries,
 } from "tsoa";
 import validateInput from "../middlewares/validate-input";
 import { UserSignInSchema, UserSignUpSchema } from "../schema";
@@ -22,6 +23,7 @@ import { IAuthDocument } from "../database/@types/auth.interface";
 import getConfig from "../utils/config";
 import { IUserDocument } from '../database/@types/user.interface';
 import { ICompanyDocument } from "../database/@types/company.interface";
+import allowRoles from "../utils/allow-roles";
 
 interface AxiosUserPostRequestResponse {
   data: {
@@ -131,7 +133,7 @@ export class AuthController {
   @Middlewares(validateInput(UserSignInSchema))
   public async LoginWithEmail(
     @Body() requestBody: IAuthDocument
-  ): Promise<{ token: string }> {
+  ): Promise<{ message: string, token: string }> {
     try {
       const { email, password } = requestBody;
 
@@ -139,6 +141,7 @@ export class AuthController {
       const jwtToken = await userService.Login({ email: email as string, password: password as string });
 
       return {
+        message: 'User login successfully',
         token: jwtToken,
       };
     } catch (error) {
@@ -146,27 +149,56 @@ export class AuthController {
     }
   }
 
+  // TODO:
+  // 1. Check if Provide Role is Valid
+  // 2. Return the Consent Screen to Client
   @SuccessResponse(StatusCode.OK, "OK")
   @Get(ROUTE_PATHS.AUTH.GOOGLE)
-  public async GoogleAuth() {
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}&response_type=code&scope=profile email`;
+  public async GoogleAuth(@Query() role: string) {
+    allowRoles({ roleProvided: role })
+
+    // // JSON-stringify and URL-encode the state
+    // const state = encodeURIComponent(JSON.stringify({ role }));
+
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${getConfig().googleClientId}&redirect_uri=${getConfig().googleRedirectUri}&response_type=code&scope=profile email&state=${role}`;
     return { url };
   }
 
+  // TODO:
+  // 1. Check if Provide Role is Valid
+  // 2. Exchange the code for tokens
+  // 3. Fetch User Profile Info by Token
+  // 4. Check If User Already Have Account With That Email (User Has Create Account Before Using Email/Password)
+  // 4.1 If does, Check if User Have GoogleId
+  // 4.1.1 If does, Means User Login With Google Before So Only Generate JWT Token
+  // 4.1.2 If not, Need to Add GoogleID and isVerified to true and Generate JWT Token
+  // 4.2 If not, It a New User => Create New User & Generate JWT Token
   @SuccessResponse(StatusCode.OK, "OK")
   @Get(ROUTE_PATHS.AUTH.GOOGLE_CALLBACK)
-  public async GoogleAuthCallback(@Query() code: string) {
+  public async GoogleAuthCallback(@Queries() queries: { code: string, state: string, [key: string]: any }) {
+    console.log('Queries', queries)
+
     try {
-      // Exchange the code for tokens
+      // Extract necessary parameters
+      const { code, state } = queries;
+
+      if (!code || !state) {
+        throw new Error("'code' and 'state' parameters are required");
+      }
+
+      // Step 1.
+      allowRoles({ roleProvided: state })
+
+      // Step 2.
       const { data } = await axios.post("https://oauth2.googleapis.com/token", {
-        clientId: process.env.CLIENT_ID,
-        client_secret: process.env.CLIENT_SECRET,
+        clientId: getConfig().googleClientId,
+        client_secret: getConfig().googleClientSecret,
         code,
-        redirect_uri: process.env.REDIRECT_URI,
+        redirect_uri: getConfig().googleRedirectUri,
         grant_type: "authorization_code",
       });
 
-      // Fetch user profile
+      // Step 3.
       const profile = await axios.get(
         "https://www.googleapis.com/oauth2/v1/userinfo",
         {
@@ -174,13 +206,15 @@ export class AuthController {
         }
       );
 
+      // Step 4.
       const userService = new UserService();
       const existingUser = await userService.FindUserByEmail({
         email: profile.data.email,
       });
 
+      // Step 4.1
       if (existingUser) {
-        // User Exists, link the Google account if it's not already linked
+        // Step 4.1.2
         if (!existingUser.googleId) {
           await userService.UpdateUser({
             id: existingUser._id,
@@ -188,9 +222,10 @@ export class AuthController {
           });
         }
 
-        // Now, proceed to log the user in
+        // Step 4.1.1 & 4.1.2 
         const jwtToken = await generateSignature({
           userId: existingUser._id,
+          role: state
         });
 
         return {
@@ -198,16 +233,18 @@ export class AuthController {
         };
       }
 
-      // No user exists with this email, create a new user
+      // Step 4.2
       const newUser = await userService.Create({
         username: profile.data.name,
         email: profile.data.email,
         isVerified: true,
         googleId: profile.data.id,
+        role: state as "USER" | "COMPANY"
       });
 
       const jwtToken = await generateSignature({
         userId: newUser._id,
+        role: state
       });
 
       return {

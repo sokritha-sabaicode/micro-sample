@@ -157,10 +157,14 @@
 									"properties": {
 										"token": {
 											"type": "string"
+										},
+										"message": {
+											"type": "string"
 										}
 									},
 									"required": [
-										"token"
+										"token",
+										"message"
 									],
 									"type": "object"
 								}
@@ -206,7 +210,16 @@
 					}
 				},
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "query",
+						"name": "role",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/v1/auth/google/callback": {
@@ -234,6 +247,14 @@
 				},
 				"security": [],
 				"parameters": [
+					{
+						"in": "query",
+						"name": "state",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
 					{
 						"in": "query",
 						"name": "code",

@@ -51,8 +51,14 @@ const proxyConfigs: ProxyConfig = {
               (req as Request).session!.jwt = responseBody.token;
             }
 
+            const filteredResponseBody = { ...responseBody };
+            // Remove the jwt property if it exists
+            if ('token' in filteredResponseBody) {
+              delete filteredResponseBody.token
+            }
+
             // Modify response to send only the message to the client
-            res.json({ message: responseBody.message });
+            res.status(proxyRes.statusCode!).json(filteredResponseBody)
           } catch (error) {
             return res.status(500).json({ message: "Error parsing response" });
           }

@@ -134,6 +134,7 @@ export function RegisterRoutes(app: Router) {
 
             function AuthController_GoogleAuth(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    role: {"in":"query","name":"role","required":true,"dataType":"string"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -163,7 +164,7 @@ export function RegisterRoutes(app: Router) {
 
             function AuthController_GoogleAuthCallback(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    code: {"in":"query","name":"code","required":true,"dataType":"string"},
+                    queries: {"in":"queries","name":"queries","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"state":{"dataType":"string","required":true},"code":{"dataType":"string","required":true}},"additionalProperties":{"dataType":"any"}},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
