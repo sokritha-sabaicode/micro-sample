@@ -42,7 +42,7 @@ async function run() {
     };
 
     const unexpectedErrorHandler = (error: unknown) => {
-      logger.error("unhandled error", { error });
+      logger.error(`unhandled error: ${error}`);
       exitHandler();
     };
 

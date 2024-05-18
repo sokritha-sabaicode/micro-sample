@@ -13,7 +13,7 @@ import compression from "compression";
 import { logger } from "./utils/logger";
 import { StatusCode } from "./utils/consts";
 import { errorHandler } from "./middlewares/error-handler";
-// import { RegisterRoutes } from "./routes/routes";
+import { RegisterRoutes } from "./routes/routes";
 import getConfig from "./utils/createConfig";
 import { verifyUser } from './middlewares/auth-middleware';
 import unless from "./middlewares/unless-route";
@@ -38,6 +38,11 @@ app.use(
     })
   })
 );
+
+app.use((_req, _res, next) => {
+  console.log("Bye");
+  next();
+})
 
 // Prevent HTTP Parameter Pollution attacks
 app.use(hpp());
@@ -67,7 +72,7 @@ app.disable("x-powered-by");
 // ===================
 // Gateway Health Routes
 // ===================
-// RegisterRoutes(app);
+RegisterRoutes(app);
 
 // ===================
 // JWT Middleware

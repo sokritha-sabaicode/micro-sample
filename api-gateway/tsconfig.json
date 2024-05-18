@@ -35,7 +35,11 @@
     "paths": {
       "@api-gateway/*": [
         "src/*"
-      ]
+      ],
+      // ADD THIS: ALLOW TS-CONFIG LOAD TSOA
+      "tsoa": [
+        "node_modules/tsoa/dist"
+      ],
     }
   }
 }

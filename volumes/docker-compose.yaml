@@ -27,6 +27,9 @@ services:
       - USER_SERVICE_URL=http://user-profile:3002
     secrets:
       - jwt_public_key
+    volumes:
+      - ../api-gateway/src:/app/src # HOT RELOADING
+    command: [ "npm", "run", "start:dev" ]
   auth:
     container_name: auth_container
     build:
@@ -42,6 +45,8 @@ services:
       - jwt_private_key
     depends_on:
       - rabbitmq
+    volumes:
+      - ../auth/src:/app/src
   user-profile:
     container_name: user_profile_container
     build:
@@ -51,6 +56,8 @@ services:
     ports:
       - 3002:3002
     env_file: ../users/configs/.env
+    volumes:
+      - ../users/src:/app/src
   notification:
     container_name: notification_container
     build:
@@ -62,6 +69,8 @@ services:
     env_file: ../notification/configs/.env
     depends_on:
       - rabbitmq
+    volumes:
+      - ../notification/src:/app/src
 secrets:
   jwt_public_key:
     file: ../api-gateway/public_key.pem
