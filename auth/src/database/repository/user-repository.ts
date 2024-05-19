@@ -1,8 +1,9 @@
-import APIError from "../../errors/api-error";
-import DuplicateError from "../../errors/duplicate-error";
-import UserModel from "../models/user.model";
-import { StatusCode } from "../../utils/consts";
-import { IAuthDocument } from "../@types/auth.interface";
+import { IAuthDocument } from "@auth/database/@types/auth.interface";
+import UserModel from "@auth/database/models/user.model";
+import APIError from "@auth/errors/api-error";
+import DuplicateError from "@auth/errors/duplicate-error";
+import { StatusCode } from "@auth/utils/consts";
+
 
 class UserRepository {
   async CreateUser(userDetail: IAuthDocument) {

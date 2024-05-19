@@ -1,15 +1,14 @@
 import express from "express";
-import { errorHandler } from "./middlewares";
-import loggerMiddleware from "./middlewares/logger-handler";
 import redoc from "redoc-express";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "../public/swagger.json";
-import { RegisterRoutes } from "./routes/v1/routes";
 import hpp from "hpp";
 import helmet from "helmet";
 import cors from "cors";
-import getConfig from "./utils/config";
-// import ipWhitelist from "./middlewares/ip-whitelist";
+import getConfig from "@auth/utils/config";
+import { RegisterRoutes } from "@auth/routes/v1/routes";
+import loggerMiddleware from "@auth/middlewares/logger-handler";
+import { errorHandler } from "@auth/middlewares";
 
 const app = express();
 
@@ -17,7 +16,6 @@ const app = express();
 // Security Middlewares
 // =======================
 app.set("trust proxy", 1);
-// // app.use(ipWhitelist([]))
 app.use(hpp());
 app.use(helmet());
 app.use(

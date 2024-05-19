@@ -8,10 +8,13 @@ services:
       - RABBITMQ_DEFAULT_USER=myuser
       - RABBITMQ_DEFAULT_PASS=mypassword
     ports:
-      # AMQP protocol port
-      - "5672:5672"
-      # Management UI
-      - "15672:15672"
+      - "5672:5672" # AMQP protocol port
+      - "15672:15672" # Management UI
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   gateway:
     container_name: gateway_container
     build:
@@ -23,13 +26,12 @@ services:
     env_file: ../api-gateway/configs/.env
     environment:
       - DOCKER_ENV=true
-      - AUTH_SERVICE_URL=http://auth:3001
-      - USER_SERVICE_URL=http://user-profile:3002
+      - AUTH_SERVICE_URL=http://auth:3001 # OVERWRITE AUTH_SERVICE_URL IN ENV FILE
+      - USER_SERVICE_URL=http://user-profile:3002 # OVERWRITE USER_SERVICE_URL IN ENV FILE
     secrets:
       - jwt_public_key
     volumes:
       - ../api-gateway/src:/app/src # HOT RELOADING
-    command: [ "npm", "run", "start:dev" ]
   auth:
     container_name: auth_container
     build:
@@ -41,10 +43,15 @@ services:
     env_file: ../auth/configs/.env
     environment:
       - DOCKER_ENV=true
+      - API_GATEWAY=http://gateway:3000
+      - COMPANY_SERVICE=http://company:3001 # OVERWRITE COMPANY_SERVICE_URL IN ENV FILE
+      - USER_SERVICE_URL=http://user-profile:3002 # OVERWRITE USER_SERVICE_URL IN ENV FILE
+      - RABBITMQ_ENDPOINT=amqp://myuser:mypassword@rabbitmq:5672 # OVERWRITE USER_RABBITMQ_ENDPOINT SERVICE_URL IN ENV FILE
     secrets:
       - jwt_private_key
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     volumes:
       - ../auth/src:/app/src
   user-profile:
@@ -56,6 +63,12 @@ services:
     ports:
       - 3002:3002
     env_file: ../users/configs/.env
+    environment:
+      - DOCKER_ENV=true
+      - API_GATEWAY=http://gateway:3000 # OVERWRITE API_GATEWAY_URL IN ENV FILE
+      - AUTH_SERVICE_URL=http://auth:3001 # OVERWRITE AUTH_SERVICE_URL IN ENV FILE
+    secrets:
+      - jwt_public_key
     volumes:
       - ../users/src:/app/src
   notification:
@@ -67,8 +80,11 @@ services:
     ports:
       - 3009:3009
     env_file: ../notification/configs/.env
+    environment:
+      - RABBITMQ_ENDPOINT=amqp://myuser:mypassword@rabbitmq:5672 # OVERWRITE USER_RABBITMQ_ENDPOINT SERVICE_URL IN ENV FILE
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     volumes:
       - ../notification/src:/app/src
 secrets:

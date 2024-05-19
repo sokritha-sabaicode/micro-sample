@@ -1,13 +1,14 @@
-import { logInit, logger } from "./utils/logger";
-import MongoDBConnector from "./database";
 import { Channel } from "amqplib";
-import app from "./app";
-import { createQueueConnection } from "./queues/connection";
-import getConfig from "./utils/config";
 import fs from 'fs';
 import path from "path";
+import { createQueueConnection } from "@auth/queues/connection";
+import getConfig from "@auth/utils/config";
+import MongoDBConnector from "@auth/database";
+import { logInit, logger } from "@auth/utils/logger";
+import app from "@auth/app";
 
 export let authChannel: Channel;
+
 
 // Check if the environment variable is set for Docker deployment
 const privateKeyPath = process.env.DOCKER_ENV

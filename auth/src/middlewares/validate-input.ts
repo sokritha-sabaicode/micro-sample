@@ -1,7 +1,8 @@
 // src/middlewares/validateMiddleware.ts
+import InvalidInputError from "@auth/errors/invalid-input-error";
 import { Request, Response, NextFunction } from "express";
 import { ZodSchema, ZodError } from "zod";
-import InvalidInputError from "../errors/invalid-input-error";
+
 
 const validateInput = (schema: ZodSchema) => {
   return (req: Request, _res: Response, next: NextFunction) => {

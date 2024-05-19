@@ -1,5 +1,5 @@
-import { SerializedErrorOutput } from "./@types/serialized-error-output";
-import BaseCustomError from "./base-custom-error";
+import { SerializedErrorOutput } from "@auth/errors/@types/serialized-error-output";
+import BaseCustomError from "@auth/errors/base-custom-error";
 
 export default class MockCustomError extends BaseCustomError {
   constructor(message: string, statusCode: number) {

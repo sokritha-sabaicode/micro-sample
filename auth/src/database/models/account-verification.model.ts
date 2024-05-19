@@ -1,5 +1,5 @@
+import APIError from "@auth/errors/api-error";
 import mongoose, { Document, Model } from "mongoose";
-import APIError from "../../errors/api-error";
 
 export interface IAccountVerificationDocument extends Document {
   userId: mongoose.Types.ObjectId;

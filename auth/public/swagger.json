@@ -78,6 +78,33 @@
 		}
 	},
 	"paths": {
+		"/auth-health": {
+			"get": {
+				"operationId": "CheckHealth",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/v1/auth/signup": {
 			"post": {
 				"operationId": "SignUpWithEmail",

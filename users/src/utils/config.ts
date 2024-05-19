@@ -12,7 +12,8 @@ function createConfig(configPath: string) {
     'MONGODB_URL',
     'LOG_LEVEL',
     'RABBITMQ_ENDPOINT',
-    'API_GATEWAY_URL',
+    'API_GATEWAY',
+    'AUTH_SERVICE'
   ];
   const missingConfig = requiredConfig.filter((key) => !process.env[key]);
 
@@ -26,11 +27,11 @@ function createConfig(configPath: string) {
   return {
     env: process.env.NODE_ENV,
     port: process.env.PORT,
-    apiGatewayUrl: process.env.API_GATEWAY_URL,
+    apiGatewayUrl: process.env.API_GATEWAY,
     logLevel: process.env.LOG_LEVEL,
     rabbitMQ: process.env.RABBITMQ_ENDPOINT,
     mongoUrl: process.env.MONGODB_URL,
-    authServiceUrl: process.env.AUTH_SERVICE_URL
+    authServiceUrl: process.env.AUTH_SERVICE
   };
 }
 

@@ -1,4 +1,4 @@
-import AccountVerificationModel from "../models/account-verification.model";
+import AccountVerificationModel from "@auth/database/models/account-verification.model";
 
 export class AccountVerificationRepository {
   async CreateVerificationToken({

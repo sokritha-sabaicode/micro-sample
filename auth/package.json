@@ -5,11 +5,15 @@
   "license": "MIT",
   "description": "Authentication microservice for our micro sample app",
   "scripts": {
-    "start:dev": "cross-env NODE_ENV=development nodemon src/server.ts",
+    "start:dev": "cross-env NODE_ENV=development nodemon --legacy-watch -r tsconfig-paths/register src/server.ts",
+    "start:prod": "pm2 start ./build/src/server.js -i 5 --attach --watch",
+    "stop": "pm2 stop all",
+    "delete": "pm2 delete all",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && ts-node tools/copyAssets.ts",
+    "test": "cross-env NODE_ENV=testing jest --coverage=true --detectOpenHandles --watchAll=false",
     "gen:spec": "tsoa spec",
     "gen:routes": "tsoa routes",
-    "gen:all": "npm run gen:spec && npm run gen:routes",
-    "test": "cross-env NODE_ENV=testing jest --watchAll"
+    "gen:all": "npm run gen:spec && npm run gen:routes"
   },
   "jest": {
     "testEnvironment": "node",
@@ -64,8 +68,11 @@
     "mongodb-memory-server": "^9.1.7",
     "nodemon": "^3.1.0",
     "supertest": "^6.3.4",
+    "ts-alias": "^0.0.7",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.4.5",
+    "typescript-transform-paths": "^3.4.7"
   }
 }

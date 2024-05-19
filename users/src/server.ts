@@ -6,7 +6,13 @@ import path from 'path';
 import fs from 'fs';
 
 // READ FILE JWT PUBLIC KEY FIRST
-export const publicKey = fs.readFileSync(path.join(__dirname, "../public_key.pem"), 'utf-8')
+// Check if the environment variable is set for Docker deployment
+const publicKeyPath = process.env.DOCKER_ENV
+  ? '/run/secrets/jwt_public_key'  // Path in Docker
+  : path.join(__dirname, '../public_key.pem');  // Path in local development
+
+
+export const publicKey = fs.readFileSync(publicKeyPath, 'utf-8');
 
 async function run() {
   try {

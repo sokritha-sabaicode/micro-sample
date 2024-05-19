@@ -1,29 +1,21 @@
-import UserService from "../services/user.service";
-import {
-  Route,
-  Post,
-  Body,
-  Middlewares,
-  SuccessResponse,
-  Query,
-  Get,
-  Queries,
-} from "tsoa";
-import validateInput from "../middlewares/validate-input";
-import { UserSignInSchema, UserSignUpSchema } from "../schema";
-import { StatusCode } from "../utils/consts";
-import { ROUTE_PATHS } from "../routes/v1/route-defs";
-import { generateSignature } from "../utils/jwt";
+import { IAuthDocument } from "@auth/database/@types/auth.interface";
+import { ICompanyDocument } from "@auth/database/@types/company.interface";
+import { IUserDocument } from "@auth/database/@types/user.interface";
+import APIError from "@auth/errors/api-error";
+import validateInput from "@auth/middlewares/validate-input";
+import { publishDirectMessage } from "@auth/queues/auth.producer";
+import { ROUTE_PATHS } from "@auth/routes/v1/route-defs";
+import { UserSignUpSchema, UserSignInSchema } from "@auth/schema";
+import { authChannel } from "@auth/server";
+import UserService from "@auth/services/user.service";
+import allowRoles from "@auth/utils/allow-roles";
+import getConfig from "@auth/utils/config";
+import { StatusCode } from "@auth/utils/consts";
+import { generateSignature } from "@auth/utils/jwt";
+import { logger } from "@auth/utils/logger";
 import axios from "axios";
-import { publishDirectMessage } from "../queues/auth.producer";
-import { authChannel } from "../server";
-import { logger } from "../utils/logger";
-import APIError from "../errors/api-error";
-import { IAuthDocument } from "../database/@types/auth.interface";
-import getConfig from "../utils/config";
-import { IUserDocument } from '../database/@types/user.interface';
-import { ICompanyDocument } from "../database/@types/company.interface";
-import allowRoles from "../utils/allow-roles";
+import { Route, SuccessResponse, Post, Middlewares, Body, Get, Queries, Query } from "tsoa";
+
 
 interface AxiosUserPostRequestResponse {
   data: {
@@ -52,7 +44,7 @@ export class AuthController {
       const newUser = await userService.Create({ username: username as string, email: email as string, password, role: role });
 
       // Step 2.
-      const verificationToken = await userService.SaveVerificationToken({ userId: newUser._id })
+      const verificationToken = await userService.SaveVerificationToken({ userId: newUser._id as string })
 
       const messageDetails = {
         receiverEmail: newUser.email,
@@ -101,7 +93,7 @@ export class AuthController {
 
       let response: AxiosUserPostRequestResponse;
       let data: IUserDocument & { authId: string } = {
-        authId: userDetail._id,
+        authId: userDetail._id as string,
         username: userDetail.username,
         email: userDetail.email,
         phoneNumber: userDetail.phoneNumber,
@@ -156,9 +148,6 @@ export class AuthController {
   @Get(ROUTE_PATHS.AUTH.GOOGLE)
   public async GoogleAuth(@Query() role: string) {
     allowRoles({ roleProvided: role })
-
-    // // JSON-stringify and URL-encode the state
-    // const state = encodeURIComponent(JSON.stringify({ role }));
 
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${getConfig().googleClientId}&redirect_uri=${getConfig().googleRedirectUri}&response_type=code&scope=profile email&state=${role}`;
     return { url };
@@ -217,12 +206,12 @@ export class AuthController {
         // Step 4.1.2
         if (!existingUser.googleId) {
           await userService.UpdateUser({
-            id: existingUser._id,
+            id: existingUser._id as string,
             updates: { googleId: profile.data.id, isVerified: true },
           });
         }
 
-        // Step 4.1.1 & 4.1.2 
+        // Step 4.1.1 & 4.1.2
         const jwtToken = await generateSignature({
           userId: existingUser._id,
           role: state

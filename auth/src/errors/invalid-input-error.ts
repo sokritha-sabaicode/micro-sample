@@ -1,7 +1,8 @@
+import { SerializedErrorOutput } from "@auth/errors/@types/serialized-error-output";
+import BaseCustomError from "@auth/errors/base-custom-error";
+import { StatusCode } from "@auth/utils/consts";
 import { ZodError } from "zod";
-import { StatusCode } from "../utils/consts";
-import { SerializedErrorOutput } from "./@types/serialized-error-output";
-import BaseCustomError from "./base-custom-error";
+
 
 export default class InvalidInputError extends BaseCustomError {
   private readonly errors: ZodError;

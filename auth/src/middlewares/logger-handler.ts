@@ -1,7 +1,7 @@
+import beautifulStringify from "@auth/utils/beautiful-stringify";
+import { logger } from "@auth/utils/logger";
 import { NextFunction, Request, Response } from "express";
-import { logger } from "../utils/logger";
 import onHeaders from "on-headers";
-import beautifulStringify from "../utils/beautiful-stringify";
 
 function loggerMiddleware(req: Request, res: Response, _next: NextFunction) {
   const started = new Date().getTime();
