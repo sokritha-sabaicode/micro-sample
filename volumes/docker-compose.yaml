@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   rabbitmq:
     container_name: rabbitmq_container
@@ -15,6 +16,71 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    container_name: cadvisor_container
+    volumes:
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:rw"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker/:/var/lib/docker:ro"
+    ports:
+      - "8080:8080"
+    restart: always
+    networks:
+      - monitoring
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node_exporter_container
+    volumes:
+      - "/proc:/host/proc:ro"
+      - "/sys:/host/sys:ro"
+      - "/:/rootfs:ro"
+      - "/etc/hostname:/etc/nodename"
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.ignored-mount-points'
+      - '^/(sys|proc|dev|host|etc)($|/)'
+    ports:
+      - "9100:9100"
+    networks:
+      - monitoring
+    restart: always
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus_container
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    restart: always
+    depends_on:
+      - cadvisor
+    networks:
+      - monitoring
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana-provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana-provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana-provisioning/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - "7070:3000"
+    restart: always
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+  
   gateway:
     container_name: gateway_container
     build:
@@ -87,6 +153,16 @@ services:
         condition: service_healthy
     volumes:
       - ../notification/src:/app/src
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+
+networks:
+  monitoring:
+    driver: bridge
+
 secrets:
   jwt_public_key:
     file: ../api-gateway/public_key.pem

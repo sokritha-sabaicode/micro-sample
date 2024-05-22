@@ -116,7 +116,6 @@ const proxyConfigs: ProxyConfig = {
           } catch (error) {
             return res.status(500).json({ message: "Error parsing response" });
           }
-
         })
       },
       error: (err: NetworkError, _req, res) => {
