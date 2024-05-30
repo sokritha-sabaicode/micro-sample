@@ -109,8 +109,8 @@ services:
     env_file: ../auth/configs/.env
     environment:
       - DOCKER_ENV=true
-      - API_GATEWAY=http://gateway:3000
-      - COMPANY_SERVICE=http://company:3001 # OVERWRITE COMPANY_SERVICE_URL IN ENV FILE
+      - API_GATEWAY_URL=http://gateway:3000
+      - COMPANY_SERVICE_URL=http://company:3001 # OVERWRITE COMPANY_SERVICE_URL IN ENV FILE
       - USER_SERVICE_URL=http://user-profile:3002 # OVERWRITE USER_SERVICE_URL IN ENV FILE
       - RABBITMQ_ENDPOINT=amqp://myuser:mypassword@rabbitmq:5672 # OVERWRITE USER_RABBITMQ_ENDPOINT SERVICE_URL IN ENV FILE
     secrets:
@@ -157,7 +157,6 @@ services:
 volumes:
   prometheus_data:
   grafana_data:
-
 
 networks:
   monitoring:

@@ -1,0 +1,16 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rabbitmq-local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true 
+reclaimPolicy: Delete # the storage deleted when PVC is deleted
+
+
+# NOTE
+# StorageClass is used to define how to create storage space when needed
+# provisioner: tell who will build the storage
+# volumeBindingMode: decide when the storage actually build or reserved
+# allowVolumeExpansion: allow storage to be expanded if necessary
+# reclaimPolicy: tell kubernetes what to do with the stroage space when it's no longer needed

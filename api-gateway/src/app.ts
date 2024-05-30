@@ -39,11 +39,6 @@ app.use(
   })
 );
 
-app.use((_req, _res, next) => {
-  console.log("Bye");
-  next();
-})
-
 // Prevent HTTP Parameter Pollution attacks
 app.use(hpp());
 

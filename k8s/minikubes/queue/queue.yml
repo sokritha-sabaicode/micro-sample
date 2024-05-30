@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet # Type of Resource to Create: `DeploymenStatefulSett`
+metadata:
+  name: microsample-queue
+  namespace: production
+spec:
+  replicas: 1 # number of pod instance = 1
+  selector: # Specifies How the Deployment Finds Which Pods to Manage
+    matchLabels:
+      app: microsample-queue
+  template:
+    metadata:
+      labels:
+        app: microsample-queue # Should match the above the selector above.
+    spec:
+      containers:
+        - name: microsample-queue
+          image: rabbitmq:3.13-rc-management-alpine
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: myuser
+            - name: RABBITMQ_DEFAULT_PASS
+              value: mypassword
+          resources:
+            limits: # the maximum resources a container can use
+              memory: "1Gi"
+              cpu: "0.5"
+            requests: # guarantee for the container
+              memory: "256Mi"
+              cpu: "100m"
+          ports:
+            - name: queue
+              containerPort: 5672
+              protocol: TCP
+            - name: mgmt
+              containerPort: 15672
+              protocol: TCP
+          volumeMounts:
+            - name: rabbitmq-local-storage
+              mountPath: /var/lib/rabbitmq
+      volumes:
+        - name: rabbitmq-local-storage
+          persistentVolumeClaim:
+            claimName: rabbitmq-pvc
+# NOTE:
+# RabbitMQ is fit with StatefulSet because
+# - Stable Network Identity
+# - Persistent Storage
+# - Ordered, Graceful Scaling and Upgrades
+
+# Replicas: Tell how many copies of the pod should be running
+# Selector: Link the Deployment Pods to Template
+# Template: Configuration of Pod

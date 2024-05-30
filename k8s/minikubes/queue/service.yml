@@ -1,0 +1,22 @@
+apiVersion: v1 # Version of Kubernetes API using to create this Object
+kind: Service
+metadata:
+  name: microsample-queue
+  namespace: production
+spec:
+  type: ClusterIP
+  selector: # Defines how the service finds which pods to target
+    app: microsample-queue
+  ports:
+    - name: queue
+      port: 5672
+      targetPort: queue
+    - name: mgmt
+      port: 15672
+      targetPort: mgmt
+      protocol: TCP
+
+
+# ClusterIP is default type of service
+# It gives your service a unique IP address
+# This IP address is reachable only within cluster, not from outside
