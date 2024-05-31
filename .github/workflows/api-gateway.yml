@@ -20,16 +20,16 @@ jobs:
           node-version: "21.7.3"
 
       - name: Install dependencies
-        run: yarn install --prefix ./api-gateway
+        run: yarn install --cwd ./api-gateway
 
       - name: Run tests
-        run: yarn test --prefix ./api-gateway
+        run: yarn test --cwd ./api-gateway
 
       - name: Build the project
-        run: yarn build --prefix ./api-gateway
+        run: yarn build --cwd ./api-gateway
 
       - name: Generate API documentation
-        run: yarn gen:all --prefix ./api-gateway
+        run: yarn gen:all --cwd ./api-gateway
 
       - name: Create environment file
         run: |
