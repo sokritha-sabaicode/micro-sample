@@ -1,0 +1,66 @@
+name: Deploy API Gateway
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'api-gateway/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '21'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile --prefix ./api-gateway
+
+    - name: Run tests
+      run: yarn test --prefix ./api-gateway
+
+    - name: Build the project
+      run: yarn build --prefix ./api-gateway
+
+    - name: Generate API documentation
+      run: yarn gen:all --prefix ./api-gateway
+    
+    - name: Create environment file
+      run: |
+        echo "NODE_ENV=production" >> .env.production
+        echo "PORT=3000" >> .env.production
+        echo "DB_HOST=${{ secrets.AUTH_SERVICE_URL }}" >> .env.production
+        echo "DB_USER=${{ secrets.CLIENT_URL }}" >> .env.production
+        echo "DB_PASS=${{ secrets.COOKIE_SECRET_KEY_ONE }}" >> .env.production
+        echo "API_KEY=${{ secrets.COOKIE_SECRET_KEY_TWO }}" >> .env.production
+        echo "API_KEY=${{ secrets.NOTIFICATION_SERVICE_URL }}" >> .env.production
+        echo "API_KEY=${{ secrets.PORT }}" >> .env.production
+        echo "API_KEY=${{ secrets.RABBITMQ_ENDPOINT }}" >> .env.production
+
+        scp -i ~/.ssh/id_rsa .env.production ec2-user@${{ secrets.EC2_IP }}:/packages/api-gateway/configs
+
+    - name: Prepare SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy build
+      run: |
+        scp -i ~/.ssh/id_rsa -r ./api-gateway/build ${{ secrets.SSH_HOST }}:/packages/api-gateway
+
+    - name: Restart API Gateway service using PM2
+      run: ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_HOST }} "pm2 reload api-gateway"
+
+    - name: Cleanup SSH keys
+      if: always()
+      run: rm -f ~/.ssh/id_rsa
+
