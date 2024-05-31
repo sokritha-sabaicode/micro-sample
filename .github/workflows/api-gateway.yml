@@ -19,14 +19,17 @@ jobs:
         with:
           node-version: "21.7.3"
 
+      - name: List directory structure
+        run: ls -lR ./api-gateway
+
       - name: Install dependencies
-        run: yarn install --cwd ./api-gateway
+        run: yarn install --cwd ./api-gateway --verbose
 
       - name: Run tests
-        run: yarn test --cwd ./api-gateway
+        run: yarn test --cwd ./api-gateway --verbose
 
       - name: Build the project
-        run: yarn build --cwd ./api-gateway
+        run: yarn build --cwd ./api-gateway --verbose
 
       - name: Generate API documentation
         run: yarn gen:all --cwd ./api-gateway
