@@ -21,7 +21,7 @@ jobs:
           cache: "yarn"
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --prefix ./api-gateway
+        run: yarn install --prefix ./api-gateway
 
       - name: Run tests
         run: yarn test --prefix ./api-gateway
