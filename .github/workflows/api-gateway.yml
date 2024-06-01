@@ -20,8 +20,7 @@ jobs:
           node-version: "21.7.3"
 
       - name: Install dependencies
-        run: yarn add 
-        working-directory: ./api-gateway
+        run: yarn add ./api-gateway --verbose
 
       - name: Run tests
         run: yarn run test --verbose
