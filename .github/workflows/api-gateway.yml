@@ -23,7 +23,7 @@ jobs:
         run: ls -lR ./api-gateway
 
       - name: Install dependencies
-        run: yarn install ./api-gateway --verbose
+        run: yarn add ./api-gateway --verbose
 
       - name: Run tests
         run: yarn test ./api-gateway --verbose
