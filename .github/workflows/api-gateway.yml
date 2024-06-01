@@ -9,7 +9,7 @@ on:
 
 defaults:
   run:
-    working-directory: /api-gateway
+    working-directory: ./api-gateway
 
 jobs:
   build-and-deploy:
