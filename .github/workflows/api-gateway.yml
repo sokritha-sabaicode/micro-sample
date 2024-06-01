@@ -9,7 +9,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./api-gateway
+    working-directory: api-gateway
 
 jobs:
   build-and-deploy:
@@ -24,13 +24,13 @@ jobs:
           node-version: "21.7.3"
 
       - name: Install dependencies
-        run: yarn add
+        run: yarn install
 
       - name: Run tests
         run: yarn run test --verbose
 
       - name: Build the project
-        run: yarn build 
+        run: yarn build
 
       - name: Generate API documentation
         run: yarn gen:all
