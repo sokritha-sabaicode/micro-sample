@@ -7,6 +7,10 @@ on:
     paths:
       - "api-gateway/**"
 
+defaults:
+  run:
+    working-directory: api-gateway
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -20,17 +24,16 @@ jobs:
           node-version: "21.7.3"
 
       - name: Install dependencies
-        run: yarn add --cwd ./api-gateway --verbose
+        run: yarn add
 
       - name: Run tests
         run: yarn run test --verbose
-        working-directory: ./api-gateway
 
       - name: Build the project
-        run: yarn build --verbose --cwd ./api-gateway
+        run: yarn build 
 
       - name: Generate API documentation
-        run: yarn gen:all --cwd ./api-gateway
+        run: yarn gen:all
 
       - name: Create environment file
         run: |
