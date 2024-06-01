@@ -23,16 +23,16 @@ jobs:
         run: ls -lR ./api-gateway
 
       - name: Install dependencies
-        run: yarn install --cwd ./api-gateway --verbose
+        run: yarn install ./api-gateway --verbose
 
       - name: Run tests
-        run: yarn test --cwd ./api-gateway --verbose
+        run: yarn test ./api-gateway --verbose
 
       - name: Build the project
-        run: yarn build --cwd ./api-gateway --verbose
+        run: yarn build ./api-gateway --verbose
 
       - name: Generate API documentation
-        run: yarn gen:all --cwd ./api-gateway
+        run: yarn gen:all ./api-gateway
 
       - name: Create environment file
         run: |
