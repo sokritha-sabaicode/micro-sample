@@ -30,7 +30,8 @@
     "jsonwebtoken": "^9.0.2",
     "tsoa": "^6.2.0",
     "typescript-transform-paths": "^3.4.7",
-    "winston": "^3.13.0"
+    "winston": "^3.13.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/compression": "^1.7.5",
