@@ -15,6 +15,8 @@ function createConfig(configPath: string) {
     );
   }
 
+  console.log(`logs: ${process.env.NODE_ENV} ${process.env.RABBITMQ_ENDPOINT}, ${process.env.CLIENT_URL}`)
+
   // Return configuration object
   return {
     env: process.env.NODE_ENV,
