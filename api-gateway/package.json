@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon --legacy-watch -r tsconfig-paths/register src/server.ts",
-    "start": "cross-env NODE_ENV=production pm2 start ./build/src/server.js --attach --watch",
+    "start": "cross-env NODE_ENV=production pm2 start ./src/server.js --attach --watch",
     "stop": "pm2 stop all",
     "restart": "npm run stop && npm run start",
     "delete": "pm2 delete all",
