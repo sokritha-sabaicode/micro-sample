@@ -6,7 +6,7 @@
       "ES2015"
     ],
     "module": "commonjs",
-    "baseUrl": ".",
+    "baseUrl": "./api-gateway",
     "outDir": "./build",
     "rootDir": ".",
     "strict": true,
