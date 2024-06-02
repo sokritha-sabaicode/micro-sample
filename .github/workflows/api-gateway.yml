@@ -26,11 +26,11 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Build the project
-        run: yarn build
-
       - name: Generate API documentation
         run: yarn gen:all
+
+      - name: Build the project
+        run: yarn build
 
       - name: Archive Production Artifact
         uses: actions/upload-artifact@v2
@@ -92,7 +92,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "api-gateway/build/*, api-gateway/package.json, api-gateway/public/*"
-          target: "/home/ec2-user/apps/api-gateway/"
+          target: "/home/ec2-user/apps/"
 
       - name: Start 
         uses: appleboy/ssh-action@master
