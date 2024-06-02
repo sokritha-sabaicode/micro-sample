@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from "path";
 
 // READ FILE JWT PUBLIC KEY FIRST
-// Check if the environment variable is set for Docker deployment!
+// Check if the environment variable is set for Docker deployment!!
 const publicKeyPath = process.env.DOCKER_ENV
   ? '/run/secrets/jwt_public_key'  // Path in Docker
   : path.join(__dirname, '../public_key.pem');  // Path in local development

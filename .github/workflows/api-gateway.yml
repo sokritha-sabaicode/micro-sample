@@ -91,8 +91,8 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "api-gateway/build/*, api-gateway/package.json, api-gateway/public/*"
-          target: "/home/ec2-user/apps/"
+          source: "api-gateway/build/*"
+          target: "/home/ec2-user/apps/api-gateway/"
 
       - name: Start 
         uses: appleboy/ssh-action@master
@@ -105,13 +105,13 @@ jobs:
             cd /home/ec2-user/apps/api-gateway
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory
-            # Install Dependency
+            # Install Dependencies
             yarn install
             # Check if the PM2 process is running
             if pm2 show api-gateway > /dev/null; then
               echo "Application is running. Restarting..."
-              yarn restart
+              pm2 restart api-gateway
             else
               echo "Application is not running. Starting..."
-              yarn start
+              pm2 start --name api-gateway
             fi
