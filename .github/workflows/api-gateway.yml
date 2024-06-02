@@ -32,26 +32,25 @@ jobs:
       - name: Generate API documentation
         run: yarn gen:all
 
-      - name: Create environment file
-        run: |
-          echo "NODE_ENV=production" >> .env.production
-          echo "PORT=3000" >> .env.production
-          echo "DB_HOST=${{ secrets.AUTH_SERVICE_URL }}" >> .env.production
-          echo "DB_USER=${{ secrets.CLIENT_URL }}" >> .env.production
-          echo "DB_PASS=${{ secrets.COOKIE_SECRET_KEY_ONE }}" >> .env.production
-          echo "API_KEY=${{ secrets.COOKIE_SECRET_KEY_TWO }}" >> .env.production
-          echo "API_KEY=${{ secrets.NOTIFICATION_SERVICE_URL }}" >> .env.production
-          echo "API_KEY=${{ secrets.PORT }}" >> .env.production
-          echo "API_KEY=${{ secrets.RABBITMQ_ENDPOINT }}" >> .env.production
-
-          scp -i ~/.ssh/id_rsa .env.production ec2-user@${{ secrets.EC2_IP }}:/packages/api-gateway/configs
-
       - name: Prepare SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create environment file
+        run: |
+          echo "NODE_ENV=production" >> .env.production
+          echo "PORT=${{ secrets.PORT }}" >> .env.production
+          echo "AUTH_SERVICE_URL=${{ secrets.AUTH_SERVICE_URL }}" >> .env.production
+          echo "CLIENT_URL=${{ secrets.CLIENT_URL }}" >> .env.production
+          echo "COOKIE_SECRET_KEY_ONE=${{ secrets.COOKIE_SECRET_KEY_ONE }}" >> .env.production
+          echo "COOKIE_SECRET_KEY_TWO=${{ secrets.COOKIE_SECRET_KEY_TWO }}" >> .env.production
+          echo "NOTIFICATION_SERVICE_URL=${{ secrets.NOTIFICATION_SERVICE_URL }}" >> .env.production
+          echo "RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}" >> .env.production
+
+          scp -i ~/.ssh/id_rsa .env.production ${{ secrets.SSH_HOST }}:/packages/api-gateway/configs
 
       - name: Deploy build
         run: |
