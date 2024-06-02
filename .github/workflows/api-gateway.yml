@@ -91,7 +91,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "api-gateway/build/*"
+          source: "build/*"
           target: "/home/ec2-user/apps/api-gateway/"
 
       - name: Start 
@@ -102,7 +102,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /home/ec2-user/apps/api-gateway
+            cd /home/ec2-user/apps/api-gateway/build
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory
             # Install Dependencies
