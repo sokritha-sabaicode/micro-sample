@@ -66,8 +66,12 @@ jobs:
             if ! type pm2 > /dev/null; then
               npm install pm2@latest -g
             fi
+            if ! type yarn > /dev/null; then
+            npm install -g yarn
+            fi
             node -v
             pm2 -v
+            yarn -v
 
       - name: Ensure target directory exists
         uses: appleboy/ssh-action@master
@@ -88,7 +92,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "api-gateway/build/*, api-gateway/package.json, api-gateway/public/*"
-          target: "/home/ec2-user/apps"
+          target: "/home/ec2-user/apps/api-gateway/"
 
       - name: Start 
         uses: appleboy/ssh-action@master
@@ -99,11 +103,15 @@ jobs:
           port: 22
           script: |
             cd /home/ec2-user/apps/api-gateway
+            echo "Checking directory contents..."
+            ls -alh # Lists all files in the current directory
+            # Install Dependency
+            yarn install
             # Check if the PM2 process is running
             if pm2 show api-gateway > /dev/null; then
               echo "Application is running. Restarting..."
-              npm run restart
+              yarn restart
             else
               echo "Application is not running. Starting..."
-              npm run start
+              yarn start
             fi
