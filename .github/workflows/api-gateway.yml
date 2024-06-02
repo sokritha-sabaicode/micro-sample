@@ -90,7 +90,7 @@ jobs:
           source: "api-gateway/build/*"
           target: "/home/ec2-user/apps"
 
-      - name: Restart application
+      - name: Start 
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
@@ -98,4 +98,12 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            pm2 reload all
+            cd /home/ec2-user/apps/api-gateway
+            # Check if the PM2 process is running
+            if pm2 show api-gateway > /dev/null; then
+              echo "Application is running. Restarting..."
+              npm run restart
+            else
+              echo "Application is not running. Starting..."
+              npm run start
+            fi
