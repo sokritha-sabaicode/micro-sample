@@ -47,7 +47,7 @@ jobs:
         with:
           name: build
           path: ./api-gateway/build
-      
+
       - name: Ensure Node.js (v20) and PM2 are installed
         uses: appleboy/ssh-action@master
         with:
@@ -62,7 +62,7 @@ jobs:
               export NVM_DIR="$HOME/.nvm"
               [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             fi
-            
+
             # Install and use Node.js v20
             nvm install 20
             nvm use 20
@@ -106,7 +106,7 @@ jobs:
           source: "api-gateway/build/*"
           target: "/home/ec2-user/apps/"
 
-      - name: Start 
+      - name: Start
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
@@ -122,8 +122,8 @@ jobs:
             # Check if the PM2 process is running
             if pm2 show api-gateway > /dev/null; then
               echo "Application is running. Restarting..."
-              pm2 restart api-gateway
+              yarn restart
             else
               echo "Application is not running. Starting..."
-              pm2 start --name api-gateway
+              yarn start
             fi
