@@ -56,8 +56,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            mkdir -p /apps
-            chown ec2-user:ec2-user /apps
+            mkdir -p /home/ec2-user/apps
+            chown ec2-user:ec2-user /home/ec2-user/apps
 
       - name: Copy files to EC2
         uses: appleboy/scp-action@master
@@ -67,7 +67,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "api-gateway/build/*"
-          target: "/apps"
+          target: "/home/ec2-user/apps"
 
       - name: Restart application
         uses: appleboy/ssh-action@master
