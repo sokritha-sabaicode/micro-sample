@@ -32,6 +32,9 @@ jobs:
       - name: Generate API documentation
         run: yarn gen:all
 
+      - name: Debug SSH connection
+        run: ssh -v -i ~/.ssh/id_rsa ${{ secrets.SSH_HOST }} echo "Connection successful"
+
       - name: Prepare SSH key
         run: |
           mkdir -p ~/.ssh
