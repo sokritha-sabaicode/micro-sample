@@ -55,7 +55,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "build/*"
+          source: "api-gateway/build/*"
           target: "/packages"
 
       - name: Restart application
