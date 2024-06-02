@@ -12,7 +12,7 @@ defaults:
     working-directory: api-gateway
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +21,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "21.7.3"
+          node-version: "16"
 
       - name: Install dependencies
         run: yarn install
@@ -32,36 +32,38 @@ jobs:
       - name: Generate API documentation
         run: yarn gen:all
 
-      - name: Debug SSH connection
-        run: ssh -v -i ~/.ssh/id_rsa ${{ secrets.SSH_HOST }} echo "Connection successful"
+      - name: Archive Production Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: ./build
 
-      - name: Prepare SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the Production Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: ./build
 
-      - name: Create environment file
-        run: |
-          echo "NODE_ENV=production" >> .env.production
-          echo "PORT=${{ secrets.PORT }}" >> .env.production
-          echo "AUTH_SERVICE_URL=${{ secrets.AUTH_SERVICE_URL }}" >> .env.production
-          echo "CLIENT_URL=${{ secrets.CLIENT_URL }}" >> .env.production
-          echo "COOKIE_SECRET_KEY_ONE=${{ secrets.COOKIE_SECRET_KEY_ONE }}" >> .env.production
-          echo "COOKIE_SECRET_KEY_TWO=${{ secrets.COOKIE_SECRET_KEY_TWO }}" >> .env.production
-          echo "NOTIFICATION_SERVICE_URL=${{ secrets.NOTIFICATION_SERVICE_URL }}" >> .env.production
-          echo "RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}" >> .env.production
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: "build/*"
+          target: "/packages"
 
-          scp -i ~/.ssh/id_rsa .env.production ${{ secrets.SSH_HOST }}:/packages/api-gateway/configs
-
-      - name: Deploy build
-        run: |
-          scp -i ~/.ssh/id_rsa -r ./api-gateway/build ${{ secrets.SSH_HOST }}:/packages/api-gateway
-
-      - name: Restart API Gateway service using PM2
-        run: ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_HOST }} "pm2 reload api-gateway"
-
-      - name: Cleanup SSH keys
-        if: always()
-        run: rm -f ~/.ssh/id_rsa
+      - name: Restart application
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            pm2 reload all
