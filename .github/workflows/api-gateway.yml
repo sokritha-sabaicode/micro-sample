@@ -47,6 +47,27 @@ jobs:
         with:
           name: build
           path: ./api-gateway/build
+      
+      - name: Ensure Node.js and PM2 are installed
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            if ! type node > /dev/null; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+              export NVM_DIR="$HOME/.nvm"
+              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+              nvm install 16
+              nvm use 16
+            fi
+            if ! type pm2 > /dev/null; then
+              npm install pm2@latest -g
+            fi
+            node -v
+            pm2 -v
 
       - name: Ensure target directory exists
         uses: appleboy/ssh-action@master
