@@ -5,10 +5,11 @@
   "license": "MIT",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon --legacy-watch -r tsconfig-paths/register src/server.ts",
-    "start:prod": "pm2 start ./build/src/server.js --attach --watch",
+    "start": "pm2 start ecosystem.config.js --attach",
     "stop": "pm2 stop all",
+    "restart": "pm2 restart ecosystem.config.js",
     "delete": "pm2 delete all",
-    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && ts-node tools/copyAssets.ts",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && cp package.json ./build/ && cp -R public ./build/public/ && cp -R configs ./build/ && cp public_key.pem ./build/ && cp ecosystem.config.js ./build/",
     "test": "cross-env NODE_ENV=testing jest --coverage=true --detectOpenHandles --watchAll=false",
     "gen:spec": "tsoa spec",
     "gen:routes": "tsoa routes",
