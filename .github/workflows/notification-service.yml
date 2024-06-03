@@ -26,9 +26,6 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Generate API documentation
-        run: yarn gen:all
-
       - name: Build the project
         run: yarn build
 
