@@ -41,7 +41,7 @@ describe("UserRepository Integration Tests", () => {
       expect(newUser.email).toEqual(MOCK_USER.email);
 
       // Check if the user exists in the database
-      const foundUser = await userRepository.FindUserById({ id: newUser._id });
+      const foundUser = await userRepository.FindUserById({ id: newUser._id as string });
       expect(foundUser).toBeDefined();
       expect(foundUser?.username).toEqual(MOCK_USER.username);
     });
