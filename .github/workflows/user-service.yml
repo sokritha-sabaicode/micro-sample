@@ -114,11 +114,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /home/ec2-user/apps/users/build
+            cd /home/ec2-user/apps/users
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory
             # Install Dependencies
-            yarn install
+            yarn install --production
             # Check if the PM2 process is running
             if pm2 show users > /dev/null; then
               echo "Application is running. Restarting..."
