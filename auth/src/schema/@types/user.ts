@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { UserSignInSchema, UserSignUpSchema } from "../user-schema";
 
 export type UserSignUpSchemaType = ReturnType<typeof UserSignUpSchema.parse>;
