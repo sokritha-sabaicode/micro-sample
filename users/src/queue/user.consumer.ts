@@ -24,7 +24,7 @@ export const consumeUserDirectMessage = async (channel: Channel): Promise<void> 
 
       const { type } = JSON.parse(msg!.content.toString())
       if (type === 'auth') {
-        const { username, email, profile, phoneNumber, createdAt } = JSON.parse(msg!.content.toString());
+        const { id, username, email, profile, phoneNumber, createdAt } = JSON.parse(msg!.content.toString());
         const user: IUserDocument = {
           username,
           email,
@@ -34,7 +34,7 @@ export const consumeUserDirectMessage = async (channel: Channel): Promise<void> 
           createdAt
         }
 
-        await userService.createUser(user);
+        await userService.CreateUser({...user, authId: id});
       }
     })
   } catch (error) {
