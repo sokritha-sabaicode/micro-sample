@@ -103,7 +103,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "user/build/*"
+          source: "users/build/*"
           target: "/home/ec2-user/apps/"
 
       - name: Start
