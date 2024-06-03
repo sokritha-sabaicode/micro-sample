@@ -1,0 +1,129 @@
+name: Deploy Auth Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "auth/**"
+
+defaults:
+  run:
+    working-directory: auth
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Generate API documentation
+        run: yarn gen:all
+
+      - name: Build the project
+        run: yarn build
+
+      - name: Archive Production Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: ./auth/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the Production Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: ./auth/build
+
+      - name: Ensure Node.js (v20) and PM2 are installed
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            # Install NVM if not installed
+            if ! type nvm > /dev/null; then
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+              export NVM_DIR="$HOME/.nvm"
+              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            fi
+
+            # Install and use Node.js v20
+            nvm install 20
+            nvm use 20
+            nvm alias default 20
+
+            # Ensure PM2 is installed
+            if ! type pm2 > /dev/null; then
+              npm install pm2@latest -g
+            fi
+
+            # Ensure Yarn is installed
+            if ! type yarn > /dev/null; then
+              npm install -g yarn
+            fi
+
+            echo "Node.js version:"
+            node -v
+            echo "PM2 version:"
+            pm2 -v
+            echo "Yarn version:"
+            yarn -v
+
+      - name: Ensure target directory exists
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            mkdir -p /home/ec2-user/apps
+            chown ec2-user:ec2-user /home/ec2-user/apps
+
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: "auth/build/*"
+          target: "/home/ec2-user/apps/"
+
+      - name: Start
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /home/ec2-user/apps/auth/build
+            echo "Checking directory contents..."
+            ls -alh # Lists all files in the current directory
+            # Install Dependencies
+            yarn install
+            # Check if the PM2 process is running
+            if pm2 show auth > /dev/null; then
+              echo "Application is running. Restarting..."
+              yarn restart
+            else
+              echo "Application is not running. Starting..."
+              yarn start
+            fi
