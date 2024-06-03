@@ -20,7 +20,7 @@ import unless from "./middlewares/unless-route";
 
 const app = express();
 
-const config = getConfig();
+const config = getConfig(process.env.NODE_ENV);
 
 // ===================
 // Security Middleware
@@ -51,7 +51,7 @@ app.use(helmet());
 // Only Allow Specific Origin to Access API Gateway (Frontend)
 app.use(
   cors({
-    origin: getConfig().env === 'development' ? '*' : [config.clientUrl as string],
+    origin: getConfig(process.env.NODE_ENV).env === 'development' ? '*' : [config.clientUrl as string],
     credentials: true, // attach token from client
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

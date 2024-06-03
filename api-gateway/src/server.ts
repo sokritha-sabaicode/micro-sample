@@ -15,7 +15,7 @@ export const publicKey = fs.readFileSync(publicKeyPath, 'utf-8');
 // RUN THE SERVER
 async function run() {
   try {
-    const config = getConfig();
+    const config = getConfig(process.env.NODE_ENV);
 
     // Activate Logger
     logInit({ env: process.env.NODE_ENV, logLevel: config.logLevel });

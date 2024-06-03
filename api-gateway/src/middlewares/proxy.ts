@@ -14,7 +14,7 @@ interface NetworkError extends Error {
   code?: string;
 }
 
-const config = getConfig();
+const config = getConfig(process.env.NODE_ENV);
 
 // Define the proxy rules and targets
 const proxyConfigs: ProxyConfig = {
