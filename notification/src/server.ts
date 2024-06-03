@@ -34,7 +34,7 @@ async function run() {
           logger.info('server closed!');
 
           // Gracefully Terminate
-          process.exit(1); // terminate the process due to error!
+          process.exit(1); // terminate the process due to error
         });
       } else {
         process.exit(1);
