@@ -1,1 +1,0 @@
-{"version":3,"file":"route-defs.js","sourceRoot":"","sources":["route-defs.ts"],"names":[],"mappings":";;;AAAa,QAAA,WAAW,GAAG;IACzB,IAAI,EAAE;QACJ,IAAI,EAAE,SAAS;QACf,OAAO,EAAE,SAAS;QAClB,KAAK,EAAE,QAAQ,EAAE,gBAAgB;QACjC,MAAM,EAAE,SAAS;QACjB,MAAM,EAAE,SAAS;QACjB,eAAe,EAAE,kBAAkB;QACnC,qCAAqC;KACtC;IACD,sCAAsC;CACvC,CAAC"}

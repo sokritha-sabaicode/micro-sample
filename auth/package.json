@@ -15,7 +15,7 @@
     "gen:spec": "tsoa spec",
     "gen:routes": "tsoa routes",
     "gen:all": "npm run gen:spec && npm run gen:routes",
-    "clean": "rm -rf ./build && rm -rf ./src/*.js && rm -rf ./src/*.js.map"
+    "clean": "rm -rf ./build && rm -rf ./src/**/*.js && rm -rf ./src/**/*.js.map"
   },
   "jest": {
     "testEnvironment": "node",
