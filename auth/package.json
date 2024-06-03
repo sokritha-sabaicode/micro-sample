@@ -6,7 +6,7 @@
   "description": "Authentication microservice for our micro sample app",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon --legacy-watch -r tsconfig-paths/register src/server.ts",
-    "start": "cross-env NODE_ENV=production pm2 start ecosystem.config.js --attach",
+    "start": "pm2 start ecosystem.config.js --attach",
     "stop": "pm2 stop all",
     "restart": "pm2 restart ecosystem.config.js",
     "delete": "pm2 delete all",
