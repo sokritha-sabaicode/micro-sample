@@ -37,7 +37,9 @@
         "src/*"
       ],
       "tsoa": [
-        "node_modules/tsoa/dist"
+        "node_modules/tsoa/dist",
+        "../node_modules/tsoa/dist",
+        "../../node_modules/tsoa/dist"
       ],
     }
   }
