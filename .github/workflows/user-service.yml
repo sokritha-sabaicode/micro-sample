@@ -5,11 +5,11 @@ on:
     branches:
       - main
     paths:
-      - "user/**"
+      - "users/**"
 
 defaults:
   run:
-    working-directory: user
+    working-directory: users
 
 jobs:
   build:
@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: build
-          path: ./user/build
+          path: ./users/build
 
   deploy:
     needs: build
@@ -46,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: build
-          path: ./user/build
+          path: ./users/build
 
       - name: Ensure Node.js (v20) and PM2 are installed
         uses: appleboy/ssh-action@master
@@ -114,13 +114,13 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /home/ec2-user/apps/user/build
+            cd /home/ec2-user/apps/users/build
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory
             # Install Dependencies
             yarn install
             # Check if the PM2 process is running
-            if pm2 show user > /dev/null; then
+            if pm2 show users > /dev/null; then
               echo "Application is running. Restarting..."
               yarn restart
             else
