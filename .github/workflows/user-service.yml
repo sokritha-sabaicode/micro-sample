@@ -118,19 +118,25 @@ jobs:
           source: "users/build/*"
           target: "/home/ec2-user/apps/"
 
-      - name: Copy Package.json to EC2
+      
+      - name: Copy Package.json to EC2 using SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
-          username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
+          username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # Ensure the target directory exists
-            mkdir -p /home/ec2-user/apps/users
+            # Debug: List current state before copying
+            echo "Listing /home/ec2-user/apps/users before copying:"
+            ls -l /home/ec2-user/apps/users
 
-            # Copy package.json directly using scp command
+            # Copy command
             scp -o StrictHostKeyChecking=no ./deployment/package.json ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/apps/users/package.json
+
+            # Debug: List after copying to verify
+            echo "Listing /home/ec2-user/apps/users after copying:"
+            ls -l /home/ec2-user/apps/users
 
       - name: Start
         uses: appleboy/ssh-action@master
