@@ -5,7 +5,7 @@ import app from "./app";
 import path from 'path';
 import fs from 'fs';
 
-// READ FILE JWT PUBLIC KEY FIRST!!!!!
+// READ FILE JWT PUBLIC KEY FIRST
 // Check if the environment variable is set for Docker deployment
 const publicKeyPath = process.env.DOCKER_ENV
   ? '/run/secrets/jwt_public_key'  // Path in Docker
