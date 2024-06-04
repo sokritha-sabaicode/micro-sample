@@ -1,7 +1,7 @@
 module.exports = {
   apps : [{
     name: "users",
-    script: "./build/src/server.js", // Adjust this path to where your server's entry point is
+    script: "./build/src/server.js",
     instances: 1,
     autorestart: true,
     watch: false,
