@@ -126,7 +126,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "./deployment/package.json"
-          target: "/home/ec2-user/apps/users"
+          target: "/home/ec2-user/apps/users/package.json"
 
       - name: Start
         uses: appleboy/ssh-action@master
