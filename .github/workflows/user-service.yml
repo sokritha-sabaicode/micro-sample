@@ -119,14 +119,18 @@ jobs:
           target: "/home/ec2-user/apps/"
 
       - name: Copy Package.json to EC2
-        uses: appleboy/scp-action@master
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
           username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "./deployment/package.json"
-          target: "/home/ec2-user/apps/users/package.json"
+          script: |
+            # Ensure the target directory exists
+            mkdir -p /home/ec2-user/apps/users
+
+            # Copy package.json directly using scp command
+            scp -o StrictHostKeyChecking=no ./deployment/package.json ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/apps/users/package.json
 
       - name: Start
         uses: appleboy/ssh-action@master
