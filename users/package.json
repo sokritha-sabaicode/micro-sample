@@ -9,7 +9,7 @@
     "stop": "pm2 stop all",
     "restart": "pm2 restart ecosystem.config.js",
     "delete": "pm2 delete all",
-    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && cp -R configs ./build/ && cp public_key.pem ./build/ && cp ecosystem.config.js ./build/ & copy package.json ./build/",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && cp -R configs ./build/ && cp public_key.pem ./build/ && cp ecosystem.config.js ./build/ & cp package.json ./build/",
     "test": "cross-env NODE_ENV=testing jest --coverage=true --detectOpenHandles --watchAll=false",
     "gen:spec": "tsoa spec",
     "gen:routes": "tsoa routes",
