@@ -33,7 +33,7 @@ jobs:
         run: yarn build
 
       - name: Archive Production Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: build
           path: ./users/build/* ./users/package.json
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get the Production Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: build
           path: ./users/build/* ./users/package.json
