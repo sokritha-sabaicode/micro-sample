@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-package-json # Different name for clarity
-          path: ./package.json
+          path: ./users/package.json
 
   deploy:
     needs: build
@@ -58,7 +58,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-package-json
-          path: ./package.json
+          path: ./deployment
 
       - name: Ensure Node.js (v20) and PM2 are installed
         uses: appleboy/ssh-action@master
@@ -125,7 +125,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "./package.json"
+          source: "./deployment/package.json"
           target: "/home/ec2-user/apps/users"
 
       - name: Start
