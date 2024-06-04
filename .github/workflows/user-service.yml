@@ -38,12 +38,6 @@ jobs:
           name: build
           path: ./users/build
 
-      - name: Upload package.json
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-package-json # Different name for clarity
-          path: ./users/package.json
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -53,12 +47,6 @@ jobs:
         with:
           name: build
           path: ./users/build
-
-      - name: Get the Production Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-package-json
-          path: ./deployment
 
       - name: Ensure Node.js (v20) and PM2 are installed
         uses: appleboy/ssh-action@master
@@ -119,7 +107,7 @@ jobs:
           target: "/home/ec2-user/apps/"
 
       
-      - name: Copy Package.json to EC2 using SSH
+      - name: Move Package.json to Correct Location
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_IP }}
@@ -127,16 +115,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # Debug: List current state before copying
-            echo "Listing /home/ec2-user/apps/users before copying:"
-            ls -l /home/ec2-user/apps/users
-
-            # Copy command
-            scp -o StrictHostKeyChecking=no ./deployment/package.json ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/apps/users/package.json
-
-            # Debug: List after copying to verify
-            echo "Listing /home/ec2-user/apps/users after copying:"
-            ls -l /home/ec2-user/apps/users
+            mv /home/ec2-user/apps/users/build/package.json /home/ec2-user/apps/users/package.json
 
       - name: Start
         uses: appleboy/ssh-action@master
