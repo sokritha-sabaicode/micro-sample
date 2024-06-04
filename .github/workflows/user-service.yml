@@ -33,20 +33,20 @@ jobs:
         run: yarn build
 
       - name: Archive Production Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: build
-          path: ./users/build/* ./users/package.json
+          path: ./users/build/*
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Get the Production Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: build
-          path: ./users/build/* ./users/package.json
+          path: ./users/build/*
 
       # New Step for yarn install
       - name: Install dependencies on EC2
