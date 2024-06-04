@@ -23,6 +23,14 @@
     "allowSyntheticDefaultImports": true,
     "pretty": true,
     "resolveJsonModule": true,
+    "paths": {
+      "@users/*": [
+        "src/*"
+      ],
+      "tsoa": [
+        "node_modules/tsoa/dist",
+      ]
+    },
     "plugins": [
       {
         "transform": "typescript-transform-paths"
@@ -30,15 +38,14 @@
       {
         "transform": "typescript-transform-paths",
         "afterDeclarations": true
-      },
-    ],
-    "paths": {
-      "@users/*": [
-        "src/*"
-      ],
-      "tsoa": [
-        "node_modules/tsoa/dist",
-      ],
-    }
-  }
+      }
+    ]
+  },
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "node_modules",
+    "tests",
+    "jest.config.js"
+  ]
 }
