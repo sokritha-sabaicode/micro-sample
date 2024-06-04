@@ -36,6 +36,7 @@ function createConfig(configPath: string) {
 }
 
 const getConfig = (currentEnv: string = 'development') => {
+  console.log('env log', currentEnv)
   const configPath =
     currentEnv === "development"
       ? path.join(__dirname, `../../configs/.env`)
