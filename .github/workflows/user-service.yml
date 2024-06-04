@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: build
-          path: ./users
+          path: ./users/build
 
   deploy:
     needs: build
@@ -46,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: build
-          path: ./users
+          path: ./users/build
 
       - name: Ensure Node.js (v20) and PM2 are installed
         uses: appleboy/ssh-action@master
@@ -103,7 +103,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }} # Update as per your setup
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: "users/*"
+          source: "users/build/*"
           target: "/home/ec2-user/apps/"
 
       - name: Start
