@@ -5,9 +5,9 @@
   "license": "MIT",
   "scripts": {
     "start:dev": "cross-env NODE_ENV=development nodemon --legacy-watch -r tsconfig-paths/register src/server.ts",
-    "start": "pm2 start ./build/ecosystem.config.js --attach",
+    "start": "pm2 start ./build/ecosystem.config.js",
     "stop": "pm2 stop all",
-    "restart": "pm2 restart ./build/ecosystem.config.js --attach",
+    "restart": "pm2 restart ./build/ecosystem.config.js",
     "delete": "pm2 delete all",
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && cp -R configs ./build/ && cp public_key.pem ./build/ && cp ecosystem.config.js ./build/ && cp package.json ./build/",
     "test": "cross-env NODE_ENV=testing jest --coverage=true --detectOpenHandles --watchAll=false",
