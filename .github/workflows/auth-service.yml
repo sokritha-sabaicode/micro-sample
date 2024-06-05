@@ -33,7 +33,7 @@ jobs:
         run: yarn build
 
       - name: Archive Production Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: ./auth/build
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get the Production Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: ./auth/build
@@ -106,6 +106,18 @@ jobs:
           source: "auth/build/*"
           target: "/home/ec2-user/apps/"
 
+      
+      - name: Move Package.json to Correct Location
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            mv /home/ec2-user/apps/auth/build/package.json /home/ec2-user/apps/auth/package.json
+
+
       - name: Start
         uses: appleboy/ssh-action@master
         with:
@@ -114,11 +126,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /home/ec2-user/apps/auth/build
+            cd /home/ec2-user/apps/auth
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory
             # Install Dependencies
-            yarn install
+            yarn install --production
             # Check if the PM2 process is running
             if pm2 show auth > /dev/null; then
               echo "Application is running. Restarting..."

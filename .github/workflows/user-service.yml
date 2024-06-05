@@ -116,7 +116,6 @@ jobs:
           port: 22
           script: |
             mv /home/ec2-user/apps/users/build/package.json /home/ec2-user/apps/users/package.json
-            mv /home/ec2-user/apps/users/build/ecosystem.config.js /home/ec2-user/apps/users/ecosystem.config.js
 
 
       - name: Start

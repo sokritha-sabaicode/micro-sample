@@ -23,11 +23,6 @@ function createConfig(configPath: string) {
     );
   }
 
-  console.log(process.env.NODE_ENV);
-  console.log(process.env.API_GATEWAY);
-  console.log(process.env.RABBITMQ_ENDPOINT)
-  console.log(process.env.AUTH_SERVICE)
-
   // Return configuration object
   return {
     env: process.env.NODE_ENV,
