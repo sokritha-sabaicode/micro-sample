@@ -6,7 +6,7 @@ import getConfig from '@notifications/utils/config';
 export async function createQueueConnection(): Promise<Channel | undefined> {
   try {
     const connection: Connection = await client.connect(
-      `${getConfig().rabbitMQ}`
+      `${getConfig(process.env.NODE_ENV).rabbitMQ}`
     );
     const channel: Channel = await connection.createChannel();
     logger.info('Nofiication server connected to queue successfully...');

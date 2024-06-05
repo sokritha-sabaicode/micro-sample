@@ -24,7 +24,7 @@ export default class NodemailerEmailApi implements EmailApi {
     try {
       const email: Email = new Email({
         message: {
-          from: `Micro Sample <${getConfig().senderEmail}>`,
+          from: `Micro Sample <${getConfig(process.env.NODE_ENV).senderEmail}>`,
         },
         send: true,
         preview: false,

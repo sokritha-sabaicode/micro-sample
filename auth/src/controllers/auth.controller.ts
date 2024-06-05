@@ -101,9 +101,9 @@ export class AuthController {
       };
 
       if (userDetail.role === 'USER') {
-        response = await axios.post(`${getConfig().userServiceUrl}/v1/users`, data)
+        response = await axios.post(`${getConfig(process.env.NODE_ENV).userServiceUrl}/v1/users`, data)
       } else { // ROLE: COMPANY
-        response = await axios.post(`${getConfig().userServiceUrl}/v1/users`, data)
+        response = await axios.post(`${getConfig(process.env.NODE_ENV).userServiceUrl}/v1/users`, data)
       }
 
       // Step 3.
@@ -149,7 +149,7 @@ export class AuthController {
   public async GoogleAuth(@Query() role: string) {
     allowRoles({ roleProvided: role })
 
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${getConfig().googleClientId}&redirect_uri=${getConfig().googleRedirectUri}&response_type=code&scope=profile email&state=${role}`;
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${getConfig(process.env.NODE_ENV).googleClientId}&redirect_uri=${getConfig(process.env.NODE_ENV).googleRedirectUri}&response_type=code&scope=profile email&state=${role}`;
     return { url };
   }
 
@@ -180,10 +180,10 @@ export class AuthController {
 
       // Step 2.
       const { data } = await axios.post("https://oauth2.googleapis.com/token", {
-        clientId: getConfig().googleClientId,
-        client_secret: getConfig().googleClientSecret,
+        clientId: getConfig(process.env.NODE_ENV).googleClientId,
+        client_secret: getConfig(process.env.NODE_ENV).googleClientSecret,
         code,
-        redirect_uri: getConfig().googleRedirectUri,
+        redirect_uri: getConfig(process.env.NODE_ENV).googleRedirectUri,
         grant_type: "authorization_code",
       });
 
