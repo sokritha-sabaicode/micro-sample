@@ -90,8 +90,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            mkdir -p /home/ec2-user/apps
-            chown ec2-user:ec2-user /home/ec2-user/apps
+            mkdir -p /home/ubuntu/apps
+            chown ubuntu:ubuntu /home/ubuntu/apps
 
       - name: Copy files to EC2
         uses: appleboy/scp-action@master
@@ -101,7 +101,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "notification/build/*"
-          target: "/home/ec2-user/apps/"
+          target: "/home/ubuntu/apps/"
 
       - name: Start
         uses: appleboy/ssh-action@master
@@ -111,7 +111,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /home/ec2-user/apps/notification/build
+            cd /home/ubuntu/apps/notification/build
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory
             # Install Dependencies

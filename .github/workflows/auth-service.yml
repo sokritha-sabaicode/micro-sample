@@ -93,8 +93,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            mkdir -p /home/ec2-user/apps
-            chown ec2-user:ec2-user /home/ec2-user/apps
+            mkdir -p /home/ubuntu/apps
+            chown ubuntu:ubuntu /home/ubuntu/apps
 
       - name: Copy files to EC2
         uses: appleboy/scp-action@master
@@ -104,7 +104,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "auth/build/*"
-          target: "/home/ec2-user/apps/"
+          target: "/home/ubuntu/apps/"
 
       
       - name: Move Package.json to Correct Location
@@ -115,7 +115,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            mv /home/ec2-user/apps/auth/build/package.json /home/ec2-user/apps/auth/package.json
+            mv /home/ubuntu/apps/auth/build/package.json /home/ubuntu/apps/auth/package.json
 
 
       - name: Start
@@ -126,7 +126,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /home/ec2-user/apps/auth
+            cd /home/ubuntu/apps/auth
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory
             # Install Dependencies
