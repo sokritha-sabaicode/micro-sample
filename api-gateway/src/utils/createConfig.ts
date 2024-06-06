@@ -6,7 +6,7 @@ function createConfig(configPath: string) {
   dotenv.config({ path: configPath });
 
   // Validate essential configuration
-  const requiredConfig = ["NODE_ENV", "PORT", "LOG_LEVEL", "RABBITMQ_ENDPOINT", "CLIENT_URL", "COOKIE_SECRET_KEY_ONE", "COOKIE_SECRET_KEY_TWO", "AUTH_SERVICE_URL", "USER_SERVICE_URL", "NOTIFICATION_SERVICE_URL"];
+  const requiredConfig = ["NODE_ENV", "PORT", "LOG_LEVEL", "RABBITMQ_ENDPOINT", "CLIENT_URL", "COOKIE_SECRET_KEY_ONE", "COOKIE_SECRET_KEY_TWO", "AUTH_SERVICE_URL", "USER_SERVICE_URL"];
   const missingConfig = requiredConfig.filter((key) => !process.env[key]);
 
   if (missingConfig.length > 0) {
@@ -17,7 +17,7 @@ function createConfig(configPath: string) {
 
   console.log(`logs: ${process.env.NODE_ENV} ${process.env.RABBITMQ_ENDPOINT}, ${process.env.CLIENT_URL}`)
 
-  // Return configuration object
+  // Return configuration fobject
   return {
     env: process.env.NODE_ENV,
     port: process.env.PORT,
@@ -28,7 +28,6 @@ function createConfig(configPath: string) {
     cookieSecretKeyTwo: process.env.COOKIE_SECRET_KEY_TWO,
     authServiceUrl: process.env.AUTH_SERVICE_URL,
     userServiceUrl: process.env.USER_SERVICE_URL,
-    notificationUrl: process.env.NOTIFICATION_SERVICE_URL
   };
 }
 

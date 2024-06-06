@@ -69,6 +69,28 @@ jobs:
           source: "api-gateway/build/*"
           target: "/home/ubuntu/apps/"
 
+      - name: Create .env file
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cat <<EOF > /home/ubuntu/apps/api-gateway/build/.env.prod
+            NODE_ENV=${{ secrets.NODE_ENV}}
+            PORT=${{ secrets.PORT }}
+            COOKIE_SECRET_KEY_ONE=${{ secrets.COOKIE_SECRET_KEY_ONE }}
+            COOKIE_SECRET_KEY_TWO=${{ secrets.COOKIE_SECRET_KEY_TWO }}
+            CLIENT_URL=${{ secrets.CLIENT_URL }}
+            LOG_LEVEL=${{ secrets.LOG_LEVEL }}
+            RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}
+            USER_SERVICE_URL=${{ secrets.USER_SERVICE_URL }}
+            AUTH_SERVICE_URL=${{ secrets.AUTH_SERVICE_URL }}
+            TEST=${{ secrets.TEST }}
+            EOF
+
+
       - name: Start
         uses: appleboy/ssh-action@master
         with:
