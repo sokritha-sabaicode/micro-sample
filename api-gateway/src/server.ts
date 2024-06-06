@@ -12,7 +12,7 @@ const publicKeyPath = process.env.DOCKER_ENV
 
 export const publicKey = fs.readFileSync(publicKeyPath, 'utf-8');
 
-// RUN THE SERVER
+// RUN THE SERVER!
 async function run() {
   try {
     const config = getConfig(process.env.NODE_ENV);
