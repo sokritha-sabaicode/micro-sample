@@ -48,43 +48,6 @@ jobs:
           name: build
           path: ./api-gateway/build
 
-      - name: Ensure Node.js (v20) and PM2 are installed
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_IP }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            # Install NVM if not installed
-            if ! type nvm > /dev/null; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-              export NVM_DIR="$HOME/.nvm"
-              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            fi
-
-            # Install and use Node.js v20
-            nvm install 20
-            nvm use 20
-            nvm alias default 20
-
-            # Ensure PM2 is installed
-            if ! type pm2 > /dev/null; then
-              npm install pm2@latest -g
-            fi
-
-            # Ensure Yarn is installed
-            if ! type yarn > /dev/null; then
-              npm install -g yarn
-            fi
-
-            echo "Node.js version:"
-            node -v
-            echo "PM2 version:"
-            pm2 -v
-            echo "Yarn version:"
-            yarn -v
-
       - name: Ensure target directory exists
         uses: appleboy/ssh-action@master
         with:
@@ -114,6 +77,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            # Load the full user environment for non-interactive shells
+            source /home/ubuntu/.nvm/nvm.sh
+            source /home/ubuntu/.profile
+            
             cd /home/ubuntu/apps/api-gateway/build
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory
