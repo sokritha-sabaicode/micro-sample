@@ -74,6 +74,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            # Load the full user environment for non-interactive shells
+            source /home/ubuntu/.nvm/nvm.sh
+            source /home/ubuntu/.profile
+
             cd /home/ubuntu/apps/notification/build
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory

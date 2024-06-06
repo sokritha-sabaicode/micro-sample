@@ -10,7 +10,7 @@ import app from "@auth/app";
 export let authChannel: Channel;
 
 
-// Check if the environment variable is set for Docker deployment!!!
+// Check if the environment variable is set for Docker deployment
 const privateKeyPath = process.env.DOCKER_ENV
   ? '/run/secrets/jwt_private_key'  // Path in Docker
   : path.join(__dirname, '../private_key.pem');  // Path in local development
