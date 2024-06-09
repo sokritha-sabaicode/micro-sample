@@ -66,6 +66,36 @@ jobs:
           source: "notification/build/*"
           target: "/home/ubuntu/apps/"
 
+      - name: Create .env file
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cat <<EOF > /home/ubuntu/apps/notification/build/configs/.env.prod
+            LOG_LEVEL=${{ secrets.LOG_LEVEL }}
+            NODE_ENV=${{ secrets.NODE_ENV}}
+            PORT=${{ secrets.PORT }}
+            RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}
+            CLIENT_URL=${{ secrets.CLIENT_URL }}
+            SMTP_HOST=${{ secrets.SMTP_HOST }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SENDER_EMAIL=${{ secrets.SENDER_EMAIL }}
+            SENDER_EMAIL_PASSWORD=${{ secrets.SENDER_EMAIL_PASSWORD }}
+            EOF
+
+      - name: Move Package.json to Correct Location
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            mv /home/ubuntu/apps/notification/build/package.json /home/ubuntu/apps/notification/package.json
+
       - name: Start
         uses: appleboy/ssh-action@master
         with:

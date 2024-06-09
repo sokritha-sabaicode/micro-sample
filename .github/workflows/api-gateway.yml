@@ -90,6 +90,15 @@ jobs:
             TEST=${{ secrets.TEST }}
             EOF
 
+      - name: Move Package.json to Correct Location
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            mv /home/ubuntu/apps/api-gateway/build/package.json /home/ubuntu/api-gateway/auth/package.json
 
       - name: Start
         uses: appleboy/ssh-action@master
@@ -102,8 +111,8 @@ jobs:
             # Load the full user environment for non-interactive shells
             source /home/ubuntu/.nvm/nvm.sh
             source /home/ubuntu/.profile
-            
-            cd /home/ubuntu/apps/api-gateway/build
+
+            cd /home/ubuntu/apps/api-gateway
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory
             # Install Dependencies

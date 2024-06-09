@@ -43,6 +43,8 @@ export async function consumeAuthEmailMessages(
         resetLink,
       };
 
+      console.log('***logs notification consumer***', locals)
+
       const emailUserSender = EmailSender.getInstance();
       await emailUserSender.sendEmail(template, receiverEmail, locals);
 

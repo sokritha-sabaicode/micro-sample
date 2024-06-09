@@ -69,7 +69,30 @@ jobs:
           source: "auth/build/*"
           target: "/home/ubuntu/apps/"
 
-      
+      - name: Create .env file
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cat <<EOF > /home/ubuntu/apps/auth/build/configs/.env.prod
+            LOG_LEVEL=${{ secrets.LOG_LEVEL }}
+            NODE_ENV=${{ secrets.NODE_ENV}}
+            PORT=${{ secrets.PORT }}
+            MONGODB_URL=${{ secrets.AUTH_MONGO_URL }}
+            RABBITMQ_ENDPOINT=${{ secrets.RABBITMQ_ENDPOINT }}
+            CLIENT_URL=${{ secrets.CLIENT_URL }}
+            USER_SERVICE_URL=${{ secrets.USER_SERVICE_URL }}
+            COMPANY_SERVICE_URL=${{ secrets.COMPANY_SERVICE_URL }}
+            API_GATEWAY_URL=${{ secrets.API_GATEWAY_URL }}
+            JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
+            EOF
+
       - name: Move Package.json to Correct Location
         uses: appleboy/ssh-action@master
         with:
@@ -79,7 +102,6 @@ jobs:
           port: 22
           script: |
             mv /home/ubuntu/apps/auth/build/package.json /home/ubuntu/apps/auth/package.json
-
 
       - name: Start
         uses: appleboy/ssh-action@master
@@ -92,7 +114,7 @@ jobs:
             # Load the full user environment for non-interactive shells
             source /home/ubuntu/.nvm/nvm.sh
             source /home/ubuntu/.profile
-            
+
             cd /home/ubuntu/apps/auth
             echo "Checking directory contents..."
             ls -alh # Lists all files in the current directory
